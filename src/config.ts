@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: "叶栢浩",
-  title: "软件开发工程师 / 游泳爱好者",
+  title: "软件开发工程师 / AI Native / 游泳爱好者",
   description:
     "叶栢浩的个人网站：专注 Context Engineering、RAG、Long-term Memory 与 Agent Runtime，把 Agent 做成可靠、可解释的真实产品。",
   accentColor: "#1d4ed8",
@@ -13,9 +13,9 @@ export const siteConfig = {
     douyin: "",
   },
   about: [
-    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "我是一名软件开发工程师，主要做 AI 应用与后端开发。过去的工作主要围绕 AI + 教育展开，探索大模型在教学与学习场景中的实际应用。我关心这些工具能否融入日常教学，帮助教师减少重复性工作，也让学生获得更有针对性的学习支持。",
+    "Java 后端开发起步，也经历过一行行手写代码的“古法编程”。现在，Vibe Coding 已经成为我的日常开发方式，我把更多精力放在架构设计上，理清系统结构和模块边界，再与 AI 协作完成实现。",
+    "工作之外，我喜欢游泳、阅读、摄影，也常逛技术博客和官方文档，尝试新的工具与做法。我也喜欢和 AI 一起把想法做成能用的产品，解决日常遇到的问题。",
   ],
   // 关于我下方的技术分类，统一维护展示名称和本地图标。
   capabilityGroups: [
@@ -93,12 +93,6 @@ export const siteConfig = {
       { title: "AI 分类总结", description: "生成分类、摘要与关键观点" },
       { title: "飞书归档", description: "保存到多维表格，继续阅读和记录笔记" },
     ],
-  },
-  // 用于验证项目列表与侧边导航的占位内容。
-  demoProject: {
-    name: "测试项目",
-    englishName: "Demo",
-    summary: "用于测试项目导航、悬停预览和滚动定位。",
   },
   /* WhisperKit 贡献模板：复用时替换下方占位配置，并恢复 OpenSource.astro 中的模板卡片。
   openSource: {

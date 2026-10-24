@@ -1,7 +1,6 @@
 ---
 import { siteConfig } from "../config";
 import KnowWhereFeatured from "./KnowWhereFeatured.astro";
-import DemoProject from "./DemoProject.astro";
 import ProjectRail from "./ProjectRail.astro";
 
 // 在此登记新项目，卡片、导航顺序和预览内容会一起更新。
@@ -11,12 +10,6 @@ const projects = [
     title: `${siteConfig.knowWhere.chineseName} / ${siteConfig.knowWhere.name}`,
     summary: siteConfig.knowWhere.summary,
     Component: KnowWhereFeatured,
-  },
-  {
-    id: "project-demo",
-    title: `${siteConfig.demoProject.name} / ${siteConfig.demoProject.englishName}`,
-    summary: siteConfig.demoProject.summary,
-    Component: DemoProject,
   },
 ];
 ---
