@@ -1,0 +1,159 @@
+<!-- 装饰与导航交互分层，水位直接复用头部的阅读进度。 -->
+<div class="header-sea" aria-hidden="true">
+  <div class="sea-boat">
+    <svg viewBox="0 0 44 38" fill="none">
+      <g class="boat-float">
+        <path class="boat-sail" d="M22 3 7 26h15V3Z" />
+        <path class="boat-small-sail" d="m26 11 10 15H26V11Z" />
+        <path d="M24 2v28" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        <path class="boat-hull" d="M5 30h35l-6 6H12l-7-6Z" />
+        <path d="M3 37h38" stroke="currentColor" stroke-opacity=".25" stroke-linecap="round" />
+      </g>
+    </svg>
+  </div>
+  <div class="sea-fish-water">
+    <div class="sea-fish fish-one">
+      <svg viewBox="0 0 22 12">
+        <path class="fish-tail" d="m6 6-5-4v8Z" />
+        <path d="M5 6Q12-2 20 6 12 14 5 6Z" />
+        <circle class="fish-eye" cx="16" cy="5.5" r=".8" />
+      </svg>
+    </div>
+    <div class="sea-fish fish-two">
+      <svg viewBox="0 0 22 12">
+        <path class="fish-tail" d="m6 6-5-4v8Z" />
+        <path d="M5 6Q12-2 20 6 12 14 5 6Z" />
+        <circle class="fish-eye" cx="16" cy="5.5" r=".8" />
+      </svg>
+    </div>
+    <div class="sea-fish fish-three">
+      <svg viewBox="0 0 22 12">
+        <path class="fish-tail" d="m6 6-5-4v8Z" />
+        <path d="M5 6Q12-2 20 6 12 14 5 6Z" />
+        <circle class="fish-eye" cx="16" cy="5.5" r=".8" />
+      </svg>
+    </div>
+  </div>
+  <div class="sea-gull gull-one">
+    <svg viewBox="0 0 24 12" fill="none"><path d="M1 8Q6 0 12 7 18 0 23 8" /></svg>
+  </div>
+  <div class="sea-gull gull-two">
+    <svg viewBox="0 0 24 12" fill="none"><path d="M1 8Q6 0 12 7 18 0 23 8" /></svg>
+  </div>
+  <div class="sea-gull gull-three">
+    <svg viewBox="0 0 24 12" fill="none"><path d="M1 8Q6 0 12 7 18 0 23 8" /></svg>
+  </div>
+</div>
+
+<style>
+  .header-sea {
+    /* 波浪初现时渐显，回到页面顶部时完全隐藏。 */
+    --sea-visible: clamp(0, calc(var(--header-progress, 0) * 24), 1);
+    /* 水位超过约两成后逐渐飞离，上滚可沿相同路径返回。 */
+    --sea-flight: clamp(0, calc((var(--header-progress, 0) - .22) * 2.2), 1);
+    position: absolute;
+    inset: 0 auto 0 20px;
+    width: min(220px, calc((100vw - 440px) / 2));
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+    opacity: var(--sea-visible);
+    color: var(--accent-ink);
+  }
+
+  .sea-boat {
+    position: absolute;
+    left: 30%;
+    bottom: calc(var(--header-progress, 0) * 100% - 8px);
+    width: 40px;
+    height: 35px;
+    animation: boat-drift 12s ease-in-out infinite alternate;
+  }
+
+  .sea-boat svg { width: 100%; height: 100%; overflow: visible; }
+  .boat-float { transform-origin: 24px 33px; animation: boat-float 6s ease-in-out infinite; }
+  .boat-sail { fill: var(--page-bg); stroke: currentColor; stroke-width: 1.2; }
+  .boat-small-sail { fill: currentColor; fill-opacity: .3; }
+  .boat-hull { fill: currentColor; fill-opacity: .75; }
+
+  /* 只在最低波谷以下绘制小鱼，浅水时裁切并渐隐，避免游出水面。 */
+  .sea-fish-water {
+    position: absolute;
+    inset: auto 0 0;
+    height: max(0px, calc(var(--header-progress, 0) * 100% - 12px));
+    overflow: hidden;
+    opacity: clamp(0, calc((var(--header-progress, 0) - .22) * 5), .7);
+  }
+
+  .sea-fish {
+    position: absolute;
+    width: 18px;
+    height: 10px;
+    fill: currentColor;
+    animation: fish-swim 9s ease-in-out infinite alternate;
+  }
+  .sea-fish svg { display: block; width: 100%; height: 100%; }
+  .fish-eye { fill: var(--page-bg); }
+  .fish-tail { transform-origin: 6px 6px; animation: fish-tail 1.1s ease-in-out infinite alternate; }
+  .fish-one { left: 12%; bottom: 20%; }
+  .fish-two { left: 51%; bottom: 52%; width: 14px; height: 8px; animation-delay: -4s; animation-direction: alternate-reverse; }
+  .fish-two svg { transform: scaleX(-1); }
+  .fish-three { left: 77%; bottom: 12%; width: 12px; height: 7px; animation-delay: -7s; }
+  .fish-three .fish-tail { animation-delay: -.5s; }
+
+  @keyframes fish-swim {
+    from { transform: translate(-6px, 0); }
+    to { transform: translate(10px, -2px); }
+  }
+  @keyframes fish-tail { from { transform: scaleX(.6); } to { transform: scaleX(1); } }
+
+  .sea-gull {
+    position: absolute;
+    bottom: calc(var(--header-progress, 0) * 100% + 12px);
+    width: 21px;
+    height: 12px;
+    transform: translate(calc(var(--sea-flight) * 44px), calc(var(--sea-flight) * -64px));
+    opacity: calc(1 - var(--sea-flight));
+  }
+
+  .sea-gull svg { width: 100%; height: 100%; overflow: visible; animation: gull-glide 6s ease-in-out infinite; }
+  .sea-gull path { stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+  .gull-one { left: 9%; }
+  .gull-two { left: 60%; bottom: calc(var(--header-progress, 0) * 100% + 24px); width: 16px; }
+  .gull-three { left: 83%; bottom: calc(var(--header-progress, 0) * 100% + 7px); width: 13px; }
+  .gull-two svg { animation-delay: -2s; }
+  .gull-three svg { animation-delay: -4s; }
+
+  @keyframes boat-drift { from { transform: translateX(-5px); } to { transform: translateX(9px); } }
+  @keyframes boat-float {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(3px) rotate(3deg); }
+  }
+  @keyframes gull-glide {
+    0%, 100% { transform: translateY(1px) scaleY(.7); }
+    50% { transform: translateY(-2px) scaleY(1); }
+  }
+
+  /* 窄屏利用左侧空白放置海面装饰，与右侧操作按钮保持间距。 */
+  @media (max-width: 767px) {
+    .header-sea { left: 16px; width: min(160px, calc(100vw - 224px)); }
+    .sea-boat { left: 6px; width: 24px; height: 21px; bottom: calc(var(--header-progress, 0) * 100% - 5px); }
+    .sea-gull { width: 12px; height: 8px; }
+    .gull-two { left: 48%; width: 9px; }
+    .gull-three { display: none; }
+    .sea-boat { animation: none; }
+    .fish-one { width: 12px; height: 7px; }
+    .fish-two { width: 10px; height: 6px; }
+    .fish-three { width: 9px; height: 5px; }
+  }
+
+  /* 减少动态效果保留静态帆船，海鸥仅随水位淡出。 */
+  @media (prefers-reduced-motion: reduce) {
+    .sea-boat, .boat-float, .sea-gull svg, .sea-fish, .fish-tail { animation: none; }
+    .sea-gull { transform: none; }
+  }
+
+  @media (prefers-contrast: more), (forced-colors: active) {
+    .header-sea { display: none; }
+  }
+</style>

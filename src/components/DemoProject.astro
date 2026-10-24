@@ -10,9 +10,9 @@ const { id, title, summary } = Astro.props;
 ---
 
 <article id={id} class="scroll-mt-20" aria-labelledby={`${id}-title`}>
-  <div class="flex min-h-[280px] flex-col items-start justify-center rounded-3xl border border-gray-200/60 bg-[#F7F8FA] p-7 sm:p-10 md:p-14 lg:min-h-[360px] lg:p-16">
-    <p class="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs font-medium text-gray-500">测试占位</p>
-    <h2 id={`${id}-title`} class="mt-6 text-3xl font-bold leading-tight tracking-tight text-gray-900 sm:text-4xl">{title}</h2>
-    <p class="mt-5 max-w-2xl text-base leading-relaxed text-gray-600 sm:text-lg">{summary}</p>
+  <div class="flex min-h-[280px] flex-col items-start justify-center rounded-3xl border border-gray-200/60 dark:border-slate-700 bg-[var(--surface-muted)] p-7 sm:p-10 md:p-14 lg:min-h-[360px] lg:p-16">
+    <p class="rounded-full border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1 text-xs font-medium text-gray-500 dark:text-slate-400">测试占位</p>
+    <h2 id={`${id}-title`} class="mt-6 text-3xl font-bold leading-tight tracking-tight text-gray-900 dark:text-slate-100 sm:text-4xl">{title}</h2>
+    <p class="mt-5 max-w-2xl text-base leading-relaxed text-gray-600 dark:text-slate-300 sm:text-lg">{summary}</p>
   </div>
 </article>

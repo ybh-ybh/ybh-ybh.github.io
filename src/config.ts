@@ -47,7 +47,7 @@ export const siteConfig = {
       ],
     },
     {
-      name: "运维与数据库",
+      name: "运维 & 数据库",
       // 先集中展示数据库、缓存、搜索和对象存储，再展示系统及交付工具。
       skills: [
         { name: "MySQL", icon: "/icons/tech/mysql.svg" },
@@ -119,7 +119,9 @@ export const siteConfig = {
   },
   // 书架保留十个位置，空位不显示虚构书名或介绍。
   books: {
-    intro: "书中自有黄金屋，书中自有颜如玉",
+    intro: "只要我还一直读书，我就能够一直理解自己的痛苦，一直与自己的无知、狭隘、偏见、阴暗，见招拆招。",
+    // 引言署名单独维护，便于在正文下方右对齐。
+    introAuthor: "加缪",
     items: [
       {
         title: "学会提问",

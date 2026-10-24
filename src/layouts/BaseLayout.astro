@@ -37,6 +37,19 @@ const personSchema = {
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#ffffff" />
+    <script is:inline>
+      // 在样式和正文绘制前恢复主题，避免深色刷新时先闪出白色。
+      (() => {
+        // 无手动选择时跟随系统，浏览器禁用存储也可正常显示。
+        let savedTheme = null;
+        try { savedTheme = localStorage.getItem("portfolio-theme"); } catch {}
+        // 只接受本站支持的两个主题值。
+        const theme = savedTheme === "light" || savedTheme === "dark"
+          ? savedTheme : matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = theme;
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", theme === "dark" ? "#0c1220" : "#ffffff");
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href={canonical} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />

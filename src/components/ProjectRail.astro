@@ -37,9 +37,9 @@ const { items } = Astro.props;
     right: 20px;
     width: 48px;
     padding: 16px 5px;
-    border: 1px solid rgb(203 213 225 / 65%);
+    border: 1px solid var(--border-color);
     border-radius: 24px;
-    background: rgb(255 255 255 / 86%);
+    background: var(--rail-glass);
     box-shadow: 0 6px 24px -8px rgb(15 23 42 / 18%);
     -webkit-backdrop-filter: blur(16px);
     backdrop-filter: blur(16px);
@@ -69,7 +69,7 @@ const { items } = Astro.props;
     padding: 4px;
     border-radius: 6px;
   }
-  .project-rail-link:focus-visible { outline: 2px solid var(--project-accent); outline-offset: 2px; }
+  .project-rail-link:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
   .project-rail-tick {
     display: block;
     flex-shrink: 0;
@@ -79,18 +79,18 @@ const { items } = Astro.props;
     background: #94a3b8;
     transition: width 120ms ease-out, background-color 120ms ease;
   }
-  .project-rail-link[data-previewing="true"] .project-rail-tick { background: #111827; }
-  .project-rail-link[aria-current="location"] .project-rail-tick { background: var(--project-accent); }
-  .project-rail-count { color: var(--project-accent); font-size: 10px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 16px; text-align: center; }
+  .project-rail-link[data-previewing="true"] .project-rail-tick { background: var(--page-ink); }
+  .project-rail-link[aria-current="location"] .project-rail-tick { background: var(--accent-ink); }
+  .project-rail-count { color: var(--accent-ink); font-size: 10px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 16px; text-align: center; }
   .project-rail-preview {
     position: absolute;
     right: calc(100% + 12px);
     top: 50%;
     width: 280px;
     padding: 18px 20px;
-    border: 1px solid rgb(229 231 235 / 80%);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
-    background: rgb(255 255 255 / 98%);
+    background: var(--preview-glass);
     box-shadow: 0 16px 40px -16px rgb(17 24 39 / 24%);
     opacity: 0;
     visibility: hidden;
@@ -106,14 +106,14 @@ const { items } = Astro.props;
   }
   /* 透明桥接区允许指针越过间隙进入预览，避免途中被收起。 */
   .project-rail-preview::after { content: ""; position: absolute; left: 100%; top: 0; bottom: 0; width: 16px; }
-  .project-rail-title { color: #111827; font-size: 14px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
+  .project-rail-title { color: var(--page-ink); font-size: 14px; font-weight: 600; line-height: 1.5; overflow-wrap: anywhere; }
   .project-rail-summary {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     overflow: hidden;
     margin-top: 8px;
-    color: #6b7280;
+    color: var(--muted-ink);
     font-size: 12px;
     line-height: 1.8;
   }
@@ -121,7 +121,7 @@ const { items } = Astro.props;
     .project-rail, .project-rail-tick, .project-rail-preview { transition: none; }
   }
   @media (prefers-reduced-transparency: reduce) {
-    .project-rail { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+    .project-rail { background: var(--surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
   }
 </style>
 

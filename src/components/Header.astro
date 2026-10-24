@@ -1,5 +1,7 @@
 ---
 import { siteConfig } from "../config";
+import ThemeSwitch from "./ThemeSwitch.astro";
+import HeaderSea from "./HeaderSea.astro";
 
 interface Props {
   homePath?: string;
@@ -20,68 +22,55 @@ const links = [
   data-transparent-at-top={homePath === "" ? "true" : undefined}
   data-at-top="true"
 >
-  <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 md:px-8 md:py-4">
-    <a
-      href={homePath || "#hero"}
-      class="font-bold text-gray-900 md:hidden"
-      aria-label={`${siteConfig.name}首页`}
-    >
-      {siteConfig.name}
-    </a>
-
-    <ul class="hidden w-full items-center justify-center gap-7 lg:gap-8 md:flex">
+  <HeaderSea />
+  <nav class="mx-auto flex max-w-7xl items-center justify-end px-5 py-3 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:px-8 md:py-4">
+    <ul class="hidden items-center justify-center gap-7 lg:gap-8 md:col-start-2 md:flex">
       {links.map((link) => (
         <li>
-          <a href={link.href} class="font-medium text-gray-700 transition-colors hover:text-black">
+          <a href={link.href} class="font-medium text-gray-700 dark:text-slate-300 transition-colors hover:text-black dark:hover:text-white">
             {link.label}
           </a>
         </li>
       ))}
-      <li>
-        <a
-          href={siteConfig.social.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white/80 px-4 py-1.5 font-medium text-gray-800 transition-all hover:-translate-y-0.5 hover:border-gray-500"
-        >
-          <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
-          </svg>
-          GitHub
-        </a>
-      </li>
     </ul>
 
-    <button
-      id="mobile-menu-button"
-      type="button"
-      class="inline-flex size-10 items-center justify-center rounded-full border border-gray-300 bg-white/90 text-gray-800 md:hidden"
-      aria-controls="mobile-menu"
-      aria-expanded="false"
-      aria-label="打开导航菜单"
-    >
-      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
-      </svg>
-    </button>
-  </nav>
-
-  <div id="mobile-menu" class="mx-4 hidden rounded-2xl border border-gray-200 bg-white/95 p-3 shadow-xl backdrop-blur md:hidden">
-    <div class="grid grid-cols-2 gap-1">
-      {links.map((link) => (
-        <a href={link.href} class="rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100">
-          {link.label}
-        </a>
-      ))}
-      <a href={siteConfig.social.github} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white" style={{ backgroundColor: siteConfig.accentColor }}>
+    <div class="flex items-center gap-3 md:col-start-3 md:justify-self-end">
+      <a
+        href={siteConfig.social.github}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex size-10 items-center justify-center gap-2 rounded-full border border-gray-300 dark:border-slate-600 bg-white/80 dark:bg-slate-800/80 font-medium text-gray-800 dark:text-slate-100 transition-all hover:-translate-y-0.5 hover:border-gray-500 sm:h-auto sm:w-auto sm:px-4 sm:py-1.5"
+        aria-label="GitHub"
+      >
         <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
         </svg>
-        GitHub 主页 ↗
+        <span class="hidden sm:inline">GitHub</span>
       </a>
-      <a href={siteConfig.social.blog} target="_blank" rel="noopener noreferrer" class="rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100">
-        我的博客
-      </a>
+      <ThemeSwitch />
+      <button
+        id="mobile-menu-button"
+        type="button"
+        class="inline-flex size-10 items-center justify-center rounded-full border border-gray-300 dark:border-slate-600 bg-white/90 dark:bg-slate-800/90 text-gray-800 dark:text-slate-100 md:hidden"
+        aria-controls="mobile-menu"
+        aria-expanded="false"
+        aria-label="打开导航菜单"
+      >
+        <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- 菜单独立悬浮，避免撑高导航毛玻璃并遮住卡片外的页面。 -->
+  <div id="mobile-menu" class="absolute inset-x-0 top-full mx-4 hidden rounded-2xl border border-gray-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-3 shadow-xl backdrop-blur md:hidden">
+    <div class="grid grid-cols-2 gap-1">
+      {links.map((link) => (
+        <a href={link.href} class="rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800">
+          {link.label}
+        </a>
+      ))}
     </div>
   </div>
 </header>
@@ -89,25 +78,57 @@ const links = [
 <style>
   /* 固定导航使用实色兜底，确保不支持背景模糊时文字仍然清晰。 */
   .site-header {
-    background: #fff;
-    border-bottom: 1px solid rgb(229 231 235 / 70%);
+    isolation: isolate;
+    background: var(--page-bg);
+    border-bottom: 1px solid var(--border-color);
     transition: background-color 180ms ease, border-color 180ms ease;
   }
 
-  /* 首页顶部让蓝色渐变连续延伸，滚动或展开菜单后再显示毛玻璃。 */
+  /* 水位随阅读进度升高，横向流动的水面保持柔和起伏。 */
+  .site-header::before {
+    /* 首尾收窄波高，保证顶部完全为空、底部完整填满。 */
+    --header-wave-height: min(12px, 100%, calc((1 - var(--header-progress, 0)) * 72px));
+    /* 连续拼接的水平水面，遮罩下半部与完整水体无缝衔接。 */
+    --header-wave-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 16' preserveAspectRatio='none'%3E%3Cpath d='M0 8C40 0 120 0 160 8S280 16 320 8V16H0Z'/%3E%3C/svg%3E");
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    z-index: -1;
+    height: calc(var(--header-progress, 0) * 100%);
+    background: var(--header-progress-tint);
+    -webkit-mask-image: linear-gradient(#000 0 0), var(--header-wave-mask);
+    mask-image: linear-gradient(#000 0 0), var(--header-wave-mask);
+    -webkit-mask-size: 100% max(0px, calc(100% - var(--header-wave-height))), 320px var(--header-wave-height);
+    mask-size: 100% max(0px, calc(100% - var(--header-wave-height))), 320px var(--header-wave-height);
+    -webkit-mask-position: left bottom, left top;
+    mask-position: left bottom, left top;
+    -webkit-mask-repeat: no-repeat, repeat-x;
+    mask-repeat: no-repeat, repeat-x;
+    animation: header-wave 6s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes header-wave {
+    to { -webkit-mask-position: left bottom, left 320px top 0; mask-position: left bottom, left 320px top 0; }
+  }
+
+  /* 减少动态效果时保留波浪轮廓，停止持续流动。 */
+  @media (prefers-reduced-motion: reduce) {
+    .site-header::before { animation: none; }
+  }
+
+  /* 首页顶部保持透明，让蓝色渐变连续延伸，同时保留背景模糊。 */
   @media not (prefers-contrast: more) {
     .site-header[data-transparent-at-top="true"][data-at-top="true"] {
       background: transparent;
       border-bottom-color: transparent;
-      -webkit-backdrop-filter: none;
-      backdrop-filter: none;
     }
   }
 
   /* 让页面内容从半透明导航下滚过，形成与参考页面相近的毛玻璃效果。 */
   @supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
     .site-header {
-      background: rgb(255 255 255 / 85%);
+      background: var(--header-glass);
       -webkit-backdrop-filter: blur(10px);
       backdrop-filter: blur(10px);
     }
@@ -115,8 +136,9 @@ const links = [
 
   /* 增强对比度模式使用实色背景，保证导航文字清晰可读。 */
   @media (prefers-contrast: more) {
+    .site-header::before { display: none; }
     .site-header {
-      background: #fff;
+      background: var(--page-bg);
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
     }
@@ -124,36 +146,69 @@ const links = [
 </style>
 
 <script>
-  // 获取固定导航容器，用于同步顶部透明状态。
+  // 获取固定导航容器，用于同步阅读进度和顶部透明状态。
   const header = document.querySelector<HTMLElement>(".site-header");
+  // 手机菜单按钮独立控制菜单开合，不改变导航背景。
   const button = document.getElementById("mobile-menu-button");
+  // 展开菜单仍复用当前导航链接，不影响阅读进度计算。
   const menu = document.getElementById("mobile-menu");
+  // 统一清理本模块的导航事件，防止热更新重复订阅。
+  const events = new AbortController();
+  // 将同一帧的滚动和尺寸变化合并为一次计算。
+  let frame = 0;
+  // 防止字体加载等异步回调唤醒已销毁实例。
+  let disposed = false;
 
-  // 仅在靠近页面顶部且菜单关闭时保持透明，避免遮挡阅读和菜单操作。
+  // 使用页面实际可滚动距离计算进度，与最右侧滚动条同步。
   const updateHeader = () => {
-    if (header) {
-      header.dataset.atTop = String(
-        window.scrollY <= 16 && button?.getAttribute("aria-expanded") !== "true",
-      );
-    }
+    if (!header || disposed) return;
+    // 页面不足一屏时按零进度处理，避免除零和无意义的填充。
+    const range = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    // 限制浏览器回弹越界，并容忍 scrollHeight 取整造成的底部小数像素差。
+    const progress = range > 0 && window.scrollY > 0
+      ? (range - window.scrollY <= 1 ? 1 : Math.min(1, window.scrollY / range)) : 0;
+    header.style.setProperty("--header-progress", progress.toFixed(5));
+    header.dataset.atTop = String(window.scrollY <= 16);
   };
 
-  window.addEventListener("scroll", updateHeader, { passive: true });
-  window.addEventListener("pageshow", updateHeader);
+  // 只调度一个渲染帧，进度不额外延迟或接管原生滚动。
+  const scheduleUpdate = () => {
+    if (frame || disposed) return;
+    frame = window.requestAnimationFrame(() => {
+      frame = 0;
+      updateHeader();
+    });
+  };
+
+  window.addEventListener("scroll", scheduleUpdate, { passive: true, signal: events.signal });
+  window.addEventListener("resize", scheduleUpdate, { signal: events.signal });
+  window.addEventListener("pageshow", scheduleUpdate, { signal: events.signal });
+  // 图片加载、正文换行或书架尺寸变化后，重新计算页面总长度。
+  const observer = new ResizeObserver(scheduleUpdate);
+  observer.observe(document.body);
+  void document.fonts.ready.then(scheduleUpdate);
   updateHeader();
 
   button?.addEventListener("click", () => {
+    // 仅切换菜单显示，背景与海面装饰保持当前滚动状态。
     const isOpen = button.getAttribute("aria-expanded") === "true";
     button.setAttribute("aria-expanded", String(!isOpen));
     menu?.classList.toggle("hidden", isOpen);
-    updateHeader();
-  });
+  }, { signal: events.signal });
 
   menu?.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
       menu.classList.add("hidden");
       button?.setAttribute("aria-expanded", "false");
-      updateHeader();
-    });
+    }, { signal: events.signal });
+  });
+
+  // 热更新只清理导航自己的事件与测量，不触碰其他滚动动画。
+  if (import.meta.hot) import.meta.hot.dispose(() => {
+    disposed = true;
+    events.abort();
+    observer.disconnect();
+    window.cancelAnimationFrame(frame);
+    header?.style.removeProperty("--header-progress");
   });
 </script>

@@ -10,12 +10,14 @@ export function initBookShelf(): () => void {
   const track = root?.querySelector<HTMLElement>(".book-track");
   if (!root || !viewport || !track) return () => {};
 
-  // 所有位置都参与切换，包含九个纯黑占位。
+  // 所有位置都参与切换，包含未填内容的纯黑占位。
   const books = Array.from(track.querySelectorAll<HTMLElement>("[data-book]"));
   // 原生同名单选控件保留无 JavaScript 操作和键盘方向键能力。
   const selectors = books.map((book) => book.querySelector<HTMLInputElement>(".book-select")!);
   // 正文与卡片分别运动，保持文字排版稳定。
   const pages = books.map((book) => book.querySelector<HTMLElement>("[data-book-page]")!);
+  // 书脊独立过渡，避免取消选中时立即铺满尚未收起的卡片。
+  const spines = books.map((book) => book.querySelector<HTMLElement>(".book-spine")!);
   if (!books.length) return () => {};
 
   // 断点或减少动态效果偏好变化时，仅重建书架自己的动画上下文。
@@ -31,12 +33,18 @@ export function initBookShelf(): () => void {
     let timeline: gsap.core.Timeline | null = null;
     // 测量完成后缓存实际展开宽度，正文不随过渡反复换行。
     let expandedWidth = 0;
+    // 缓存收起项的实际像素宽度。
+    let collapsedWidth = 0;
+    // 展开项的书脊宽度与 CSS 正文偏移保持一致。
+    let spineWidth = 0;
     // 缓存书籍间距，用于手机切换时将展开项带入阅读区域。
     let itemGap = 0;
     // 控制所有书架事件的生命周期。
     const controller = new AbortController();
     // 防止异步字体回调访问已经清理的书架。
     let disposed = false;
+    // 只响应鼠标实际位移，卡片运动经过指针时不连锁切换。
+    let pointerPosition: { x: number; y: number } | null = null;
 
     // 同时更新单选、可访问状态与整排卡片的同步动画。
     const applyLayout = (animate: boolean) => {
@@ -56,6 +64,9 @@ export function initBookShelf(): () => void {
         timeline!.to(book, compact
           ? { width: selected ? expandedWidth : 38, rotateY: 0, duration, ease: "power3.out" }
           : { flexGrow: selected ? grow : 1, rotateY: selected ? 0 : index < active ? -8 : 8, duration, ease: "power3.out" }, 0);
+        if (!book.classList.contains("book-placeholder")) {
+          timeline!.to(spines[index], { width: selected ? spineWidth : collapsedWidth, duration, ease: "power3.out" }, 0);
+        }
         timeline!.to(pages[index], { opacity: selected ? 1 : 0, x: selected ? 0 : -14, duration: selected ? duration : duration * 0.6, ease: "power3.out" }, 0);
       });
       if (compact) timeline.to(viewport, { scrollLeft: active * (38 + itemGap), duration, ease: "power3.out" }, 0);
@@ -79,6 +90,9 @@ export function initBookShelf(): () => void {
       const gap = parseFloat(getComputedStyle(track).gap) || 0;
       itemGap = gap;
       expandedWidth = compact ? Math.min(360, width) : books.length === 1 ? width : Math.max(0, width - gap * (books.length - 1)) * 0.45;
+      collapsedWidth = compact ? 38 : books.length > 1 ? Math.max(0, width - gap * (books.length - 1) - expandedWidth) / (books.length - 1) : width;
+      // 正文左偏移已由浏览器解析 clamp，与 CSS 书脊宽度保持同源。
+      spineWidth = parseFloat(getComputedStyle(pages[0]).left);
       root.style.setProperty("--book-expanded-width", `${expandedWidth}px`);
       applyLayout(false);
     };
@@ -88,12 +102,18 @@ export function initBookShelf(): () => void {
     // 仅订阅固定外层，动画不会触发循环测量。
     const observer = new ResizeObserver(measure);
     observer.observe(viewport);
-    books.forEach((book, index) => {
-      book.addEventListener("pointerenter", (event) => {
-        if (event.pointerType === "mouse" && hover.matches) setActive(index);
-      }, { signal: controller.signal });
-      selectors[index].addEventListener("change", () => {
-        if (selectors[index].checked) setActive(index);
+    track.addEventListener("pointermove", (event) => {
+      if (event.pointerType !== "mouse" || !hover.matches) return;
+      if (pointerPosition?.x === event.clientX && pointerPosition?.y === event.clientY) return;
+      pointerPosition = { x: event.clientX, y: event.clientY };
+      // 从真正发生移动的指针目标查找书籍，间隙不改变选中状态。
+      const book = event.target instanceof Element ? event.target.closest<HTMLElement>("[data-book]") : null;
+      if (book) setActive(books.indexOf(book));
+    }, { signal: controller.signal });
+    track.addEventListener("pointerleave", () => { pointerPosition = null; }, { signal: controller.signal });
+    selectors.forEach((selector, index) => {
+      selector.addEventListener("change", () => {
+        if (selector.checked) setActive(index);
       }, { signal: controller.signal });
     });
     void document.fonts.ready.then(measure);
@@ -108,6 +128,7 @@ export function initBookShelf(): () => void {
         book.style.removeProperty("width");
         book.style.removeProperty("flex-grow");
         book.style.removeProperty("transform");
+        spines[index].style.removeProperty("width");
         pages[index].style.removeProperty("opacity");
         pages[index].style.removeProperty("transform");
       });

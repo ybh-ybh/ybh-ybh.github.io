@@ -63,15 +63,15 @@ const expandedGrow = items.length > 1 ? (0.45 * (items.length - 1)) / 0.55 : 1;
     min-width: 26px;
     overflow: hidden;
     border-radius: 5px 9px 9px 5px;
-    background: #2346b4;
+    background: var(--book-surface);
     box-shadow: 0 12px 18px -16px rgb(15 23 42 / 50%);
     transform-style: preserve-3d;
     transform-origin: center;
   }
-  .book:has(.book-select:checked) { flex-grow: var(--book-expanded-grow); background: #f6f8fc; }
+  .book:has(.book-select:checked) { flex-grow: var(--book-expanded-grow); }
   .book-placeholder { background: #000; }
   .book-placeholder:has(.book-select:checked) { background: #000; }
-  .book:has(.book-select:focus-visible) { outline: 2px solid #1d4ed8; outline-offset: 3px; }
+  .book:has(.book-select:focus-visible) { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
   .book-spine {
     position: absolute;
     inset: 0 auto 0 0;
@@ -125,12 +125,16 @@ const expandedGrow = items.length > 1 ? (0.45 * (items.length - 1)) / 0.55 : 1;
   .book:has(.book-select:checked) .book-page { opacity: 1; visibility: visible; pointer-events: auto; }
   /* 正文保持展开后的排版宽度，切换时只渐隐和平移，避免逐帧重新换行。 */
   .book-shelf[data-enhanced="true"] .book-page { right: auto; width: calc(var(--book-expanded-width) - var(--spine-width)); visibility: visible; }
-  .book-category { color: #2346b4; font-size: 11px; line-height: 1.5; letter-spacing: 0.12em; }
-  .book-page h3 { margin-top: 20px; color: #111827; font-family: "Songti SC", "SimSun", serif; font-size: 34px; font-weight: 600; line-height: 1.2; }
-  .book-authors { margin-top: 14px; color: #64748b; font-size: 12px; line-height: 1.8; }
-  .book-description { margin-top: 24px; padding-top: 20px; border-top: 1px solid #dce2ed; color: #475569; font-size: 15px; line-height: 1.9; }
+  .book-category { color: var(--accent-ink); font-size: 11px; line-height: 1.5; letter-spacing: 0.12em; }
+  .book-page h3 { margin-top: 20px; color: var(--page-ink); font-family: "Songti SC", "SimSun", serif; font-size: 34px; font-weight: 600; line-height: 1.2; }
+  .book-authors { margin-top: 14px; color: var(--muted-ink); font-size: 12px; line-height: 1.8; }
+  .book-description { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color); color: var(--body-copy); font-size: 15px; line-height: 1.9; }
   .book-hint { margin-top: 4px; color: #6b7280; font-size: 12px; line-height: 1.8; }
   .book-hint-touch { display: none; }
+  /* 桌面书籍均分整排，倾斜投影的临时溢出不应生成滚动条或改变外层高度。 */
+  @media (min-width: 1024px) {
+    .book-shelf-scroll { overflow-x: clip; overflow-y: visible; }
+  }
   @media (min-width: 768px) and (max-width: 1023px) {
     .book-page { padding: 24px; }
     .book-page h3 { font-size: 28px; }
