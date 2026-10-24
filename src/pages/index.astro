@@ -1,0 +1,27 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Hero from "../components/Hero.astro";
+import About from "../components/About.astro";
+import Projects from "../components/Projects.astro";
+import OpenSource from "../components/OpenSource.astro";
+import Books from "../components/Books.astro";
+---
+
+<BaseLayout>
+  <!-- 只裁切前两段横向飞离的元素，不创建新的纵向滚动容器。 -->
+  <div class="overflow-x-clip" data-scroll-scatter>
+    <Hero />
+    <About />
+  </div>
+  <Projects />
+  <OpenSource />
+  <Books />
+</BaseLayout>
+
+<script>
+  import { initScrollScatter } from "../scripts/scrollScatter";
+
+  // 页面仅创建一个散开实例，热更新时还原旧实例。
+  const disposeScatter = initScrollScatter();
+  if (import.meta.hot) import.meta.hot.dispose(disposeScatter);
+</script>

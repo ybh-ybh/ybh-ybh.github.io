@@ -1,0 +1,13 @@
+<!-- 根据用户黑色封面重排：米白德文与书名、留黑主体、下方银白信息带。 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="820" viewBox="0 0 100 820" preserveAspectRatio="none" fill="none">
+  <defs>
+    <linearGradient id="black" x2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#303030"/><stop offset=".12" stop-color="#111"/><stop offset=".52" stop-color="#080808"/><stop offset="1" stop-color="#202020"/></linearGradient>
+    <linearGradient id="band" x2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#d1d1cc"/><stop offset=".16" stop-color="#f4f4ef"/><stop offset=".58" stop-color="#e5e5de"/><stop offset="1" stop-color="#c7c8c5"/></linearGradient>
+  </defs>
+  <path fill="url(#black)" d="M0 0H100V820H0Z"/>
+  <path d="M6 0V820M95 0V820" stroke="#c2bbaa" stroke-opacity=".12"/>
+  <path d="M21 125H79" stroke="#bfb2a0" stroke-width=".7" stroke-opacity=".5"/>
+  <path fill="url(#band)" d="M0 640H100V820H0Z"/>
+  <path d="M0 640H100M0 647H100" stroke="#f6f5ee" stroke-width="1.2"/>
+  <path d="M19 793H81" stroke="#53504b" stroke-width=".7" stroke-opacity=".6"/>
+</svg>

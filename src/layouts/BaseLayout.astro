@@ -1,0 +1,64 @@
+---
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { siteConfig } from "../config";
+import "../styles/global.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  canonicalPath?: string;
+  homePath?: string;
+}
+
+const {
+  title = `${siteConfig.name} - 个人简介`,
+  description = siteConfig.description,
+  canonicalPath = "/",
+  homePath = "",
+} = Astro.props;
+const canonical = new URL(canonicalPath, "https://ybh-ybh.github.io").toString();
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: siteConfig.name,
+  url: "https://ybh-ybh.github.io/",
+  jobTitle: siteConfig.title,
+  alumniOf: { "@type": "CollegeOrUniversity", name: "武汉大学" },
+  sameAs: [siteConfig.social.github, siteConfig.social.douyin],
+};
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap"
+      rel="stylesheet"
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <Header homePath={homePath} />
+    <main><slot /></main>
+    <Footer />
+  </body>
+</html>

@@ -1,0 +1,45 @@
+<!-- 依据用户提供的蓝色封面，将花叶问号与底部花饰重新排布为窄幅书脊。 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="820" viewBox="0 0 100 820" preserveAspectRatio="none" fill="none">
+  <defs>
+    <linearGradient id="cloth" x1="0" y1="0" x2="100" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#47658f"/>
+      <stop offset=".08" stop-color="#5a7aa7"/>
+      <stop offset=".45" stop-color="#6081ae"/>
+      <stop offset=".84" stop-color="#5879a6"/>
+      <stop offset="1" stop-color="#45648f"/>
+    </linearGradient>
+    <pattern id="paper" width="5" height="6" patternUnits="userSpaceOnUse">
+      <path d="M0 1H5M1 4H4" stroke="#eff3f5" stroke-opacity=".055" stroke-width=".6"/>
+    </pattern>
+    <g id="vine">
+      <path d="M-15 13C-3 17 13 8 10-4 8-14-7-15-10-5-12 2-5 7 1 3" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/>
+      <path d="M8-8C21-13 24-2 14 4 18-4 13-6 8-8ZM-6 13C-18 17-22 5-13 0-17 8-11 10-6 13Z" fill="currentColor"/>
+    </g>
+    <g id="flower">
+      <path d="M0-20C-16-34-28-12-10-5-31-5-29 20-9 13-20 33 7 41 9 19 18 39 38 20 21 8 44 10 42-17 21-12 30-33 3-41 0-20Z" stroke="currentColor" stroke-width="3"/>
+      <path d="M-1-10C-12-15-17-1-7 3-14 15 3 22 7 10 20 16 24-2 12-7 15-19 0-24-1-10Z" stroke="currentColor" stroke-width="2.5"/>
+      <circle r="4" fill="currentColor"/>
+    </g>
+  </defs>
+  <path fill="url(#cloth)" d="M0 0H100V820H0Z"/>
+  <path fill="url(#paper)" d="M0 0H100V820H0Z"/>
+  <path d="M5 0V820M94 0V820" stroke="#e3e6d5" stroke-opacity=".18"/>
+  <!-- 金色主枝与浅绿、米白色卷叶构成问号，不使用封面的低清文字。 -->
+  <path d="M21 92C4 62 24 28 52 30 87 30 104 65 85 94 76 109 54 113 52 146" stroke="#dbb55a" stroke-width="7" stroke-linecap="round"/>
+  <path d="M17 78C5 44 42 15 72 37 99 56 91 87 75 98 62 108 49 117 49 139" stroke="#e6e1b1" stroke-width="2.8" stroke-linecap="round"/>
+  <use href="#vine" transform="translate(20 77) rotate(-65)" color="#d8dbaa"/>
+  <use href="#vine" transform="translate(22 54) rotate(-26)" color="#e6d9a0"/>
+  <use href="#vine" transform="translate(38 34) rotate(24)" color="#afc9ad"/>
+  <use href="#vine" transform="translate(61 31) rotate(66)" color="#e4d39b"/>
+  <use href="#vine" transform="translate(80 47) rotate(110)" color="#cbd8b8"/>
+  <use href="#vine" transform="translate(87 70) rotate(150)" color="#dfdba6"/>
+  <use href="#vine" transform="translate(78 94) rotate(187)" color="#b8cdb0"/>
+  <use href="#vine" transform="translate(61 113) rotate(154) scale(.8)" color="#e4c87e"/>
+  <use href="#vine" transform="translate(51 139) rotate(161) scale(.62)" color="#cbd6ac"/>
+  <use href="#flower" transform="translate(51 174) scale(.48)" color="#e3d7a4"/>
+  <circle cx="51" cy="174" r="2.8" fill="#cfb56e"/>
+  <!-- 小花饰呼应参考封面下方的圆形纹样，留出中部竖排书名。 -->
+  <use href="#flower" transform="translate(50 683) scale(.64)" color="#c4cda6"/>
+  <use href="#flower" transform="translate(50 683) rotate(35) scale(.46)" color="#dfc27b"/>
+  <path d="M22 738H78M30 744H70" stroke="#d6ddb9" stroke-width=".8" stroke-opacity=".7"/>
+</svg>

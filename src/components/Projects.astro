@@ -1,0 +1,33 @@
+---
+import { siteConfig } from "../config";
+import KnowWhereFeatured from "./KnowWhereFeatured.astro";
+import DemoProject from "./DemoProject.astro";
+import ProjectRail from "./ProjectRail.astro";
+
+// 在此登记新项目，卡片、导航顺序和预览内容会一起更新。
+const projects = [
+  {
+    id: "project-knowwhere",
+    title: `${siteConfig.knowWhere.chineseName} / ${siteConfig.knowWhere.name}`,
+    summary: siteConfig.knowWhere.summary,
+    Component: KnowWhereFeatured,
+  },
+  {
+    id: "project-demo",
+    title: `${siteConfig.demoProject.name} / ${siteConfig.demoProject.englishName}`,
+    summary: siteConfig.demoProject.summary,
+    Component: DemoProject,
+  },
+];
+---
+
+<section id="projects" class="section-shell" aria-labelledby="projects-title">
+  <div class="mb-10 lg:mb-16">
+    <h2 id="projects-title" class="section-title">我的项目</h2>
+    <div class="section-rule" style={{ backgroundColor: siteConfig.accentColor }}></div>
+  </div>
+  <div class="space-y-10 lg:space-y-16">
+    {projects.map(({ Component, ...project }) => <Component {...project} />)}
+  </div>
+  <ProjectRail items={projects} />
+</section>

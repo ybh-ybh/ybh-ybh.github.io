@@ -1,0 +1,29 @@
+---
+import { siteConfig } from "../config";
+import BookShelf from "./BookShelf.astro";
+// 书籍内容与黑色占位统一从配置读取。
+const books = siteConfig.books;
+// 沿用其他区域的蓝色标题装饰。
+const accent = siteConfig.accentColor;
+---
+
+<section id="books" class="section-shell" aria-labelledby="books-title">
+  <div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+      <div class="lg:col-span-4">
+        <h2 id="books-title" class="text-3xl sm:text-4xl md:text-5xl xl:text-7xl font-bold text-gray-900">
+          书籍推荐
+        </h2>
+        <div class="w-[75px] h-[5px] mt-2 rounded-full" style={`background-color: ${accent}`} />
+      </div>
+
+      <div class="lg:col-span-8">
+        <p class="text-lg sm:text-xl md:text-2xl leading-relaxed text-gray-600">{books.intro}</p>
+      </div>
+    </div>
+
+    <div class="mt-10 lg:mt-16">
+      <BookShelf items={books.items} />
+    </div>
+  </div>
+</section>

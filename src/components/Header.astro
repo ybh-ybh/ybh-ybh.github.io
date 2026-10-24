@@ -1,0 +1,159 @@
+---
+import { siteConfig } from "../config";
+
+interface Props {
+  homePath?: string;
+}
+
+const { homePath = "" } = Astro.props;
+const href = (hash: string) => `${homePath}${hash}`;
+const links = [
+  { label: "关于", href: href("#about") },
+  { label: "我的项目", href: href("#projects") },
+  { label: "开源贡献", href: href("#opensource") },
+  { label: "书籍", href: href("#books") },
+];
+---
+
+<header
+  class="site-header fixed inset-x-0 top-0 z-50"
+  data-transparent-at-top={homePath === "" ? "true" : undefined}
+  data-at-top="true"
+>
+  <nav class="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 md:px-8 md:py-4">
+    <a
+      href={homePath || "#hero"}
+      class="font-bold text-gray-900 md:hidden"
+      aria-label={`${siteConfig.name}首页`}
+    >
+      {siteConfig.name}
+    </a>
+
+    <ul class="hidden w-full items-center justify-center gap-7 lg:gap-8 md:flex">
+      {links.map((link) => (
+        <li>
+          <a href={link.href} class="font-medium text-gray-700 transition-colors hover:text-black">
+            {link.label}
+          </a>
+        </li>
+      ))}
+      <li>
+        <a
+          href={siteConfig.social.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white/80 px-4 py-1.5 font-medium text-gray-800 transition-all hover:-translate-y-0.5 hover:border-gray-500"
+        >
+          <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
+          </svg>
+          GitHub
+        </a>
+      </li>
+    </ul>
+
+    <button
+      id="mobile-menu-button"
+      type="button"
+      class="inline-flex size-10 items-center justify-center rounded-full border border-gray-300 bg-white/90 text-gray-800 md:hidden"
+      aria-controls="mobile-menu"
+      aria-expanded="false"
+      aria-label="打开导航菜单"
+    >
+      <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round" />
+      </svg>
+    </button>
+  </nav>
+
+  <div id="mobile-menu" class="mx-4 hidden rounded-2xl border border-gray-200 bg-white/95 p-3 shadow-xl backdrop-blur md:hidden">
+    <div class="grid grid-cols-2 gap-1">
+      {links.map((link) => (
+        <a href={link.href} class="rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100">
+          {link.label}
+        </a>
+      ))}
+      <a href={siteConfig.social.github} target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white" style={{ backgroundColor: siteConfig.accentColor }}>
+        <svg aria-hidden="true" class="size-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21" />
+        </svg>
+        GitHub 主页 ↗
+      </a>
+      <a href={siteConfig.social.blog} target="_blank" rel="noopener noreferrer" class="rounded-xl px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-100">
+        我的博客
+      </a>
+    </div>
+  </div>
+</header>
+
+<style>
+  /* 固定导航使用实色兜底，确保不支持背景模糊时文字仍然清晰。 */
+  .site-header {
+    background: #fff;
+    border-bottom: 1px solid rgb(229 231 235 / 70%);
+    transition: background-color 180ms ease, border-color 180ms ease;
+  }
+
+  /* 首页顶部让蓝色渐变连续延伸，滚动或展开菜单后再显示毛玻璃。 */
+  @media not (prefers-contrast: more) {
+    .site-header[data-transparent-at-top="true"][data-at-top="true"] {
+      background: transparent;
+      border-bottom-color: transparent;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+
+  /* 让页面内容从半透明导航下滚过，形成与参考页面相近的毛玻璃效果。 */
+  @supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    .site-header {
+      background: rgb(255 255 255 / 85%);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+  }
+
+  /* 增强对比度模式使用实色背景，保证导航文字清晰可读。 */
+  @media (prefers-contrast: more) {
+    .site-header {
+      background: #fff;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
+    }
+  }
+</style>
+
+<script>
+  // 获取固定导航容器，用于同步顶部透明状态。
+  const header = document.querySelector<HTMLElement>(".site-header");
+  const button = document.getElementById("mobile-menu-button");
+  const menu = document.getElementById("mobile-menu");
+
+  // 仅在靠近页面顶部且菜单关闭时保持透明，避免遮挡阅读和菜单操作。
+  const updateHeader = () => {
+    if (header) {
+      header.dataset.atTop = String(
+        window.scrollY <= 16 && button?.getAttribute("aria-expanded") !== "true",
+      );
+    }
+  };
+
+  window.addEventListener("scroll", updateHeader, { passive: true });
+  window.addEventListener("pageshow", updateHeader);
+  updateHeader();
+
+  button?.addEventListener("click", () => {
+    const isOpen = button.getAttribute("aria-expanded") === "true";
+    button.setAttribute("aria-expanded", String(!isOpen));
+    menu?.classList.toggle("hidden", isOpen);
+    updateHeader();
+  });
+
+  menu?.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      menu.classList.add("hidden");
+      button?.setAttribute("aria-expanded", "false");
+      updateHeader();
+    });
+  });
+</script>

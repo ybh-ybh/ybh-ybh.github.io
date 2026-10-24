@@ -1,0 +1,18 @@
+<!-- 根据用户白色铅笔封面重排：弯曲铅笔线、橙色笔杆与红色圆章。 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="820" viewBox="0 0 100 820" preserveAspectRatio="none" fill="none">
+  <defs>
+    <linearGradient id="paper" x2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#d9dcdf"/><stop offset=".12" stop-color="#f6f7f7"/><stop offset=".5" stop-color="#fff"/><stop offset="1" stop-color="#eceeef"/></linearGradient>
+    <linearGradient id="pencil" x1="0" y1="172" x2="0" y2="187" gradientUnits="userSpaceOnUse"><stop stop-color="#f6b24a"/><stop offset=".45" stop-color="#ed8c26"/><stop offset="1" stop-color="#c96f24"/></linearGradient>
+  </defs>
+  <path fill="url(#paper)" d="M0 0H100V820H0Z"/>
+  <path d="M7 0V820M95 0V820" stroke="#b8bec2" stroke-opacity=".25"/>
+  <path d="M68 24C38 40 11 55 17 78 23 103 90 98 92 126 94 145 80 160 82 179" stroke="#797d7e" stroke-width="1.5" stroke-linecap="round"/>
+  <path d="M68 24L58 30" stroke="#b8b9b8" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M17 173H79V186H17Z" fill="url(#pencil)"/>
+  <path d="M24 176H77M25 183H77" stroke="#f8d47c" stroke-opacity=".8" stroke-width="1"/>
+  <path d="M78 173L94 179.5 78 186Z" fill="#dbc8a6"/><path d="M89 177.5L96 179.5 89 181.5Z" fill="#303237"/>
+  <rect x="4" y="173" width="10" height="13" rx="2" fill="#ce3771"/><path fill="#34343b" d="M13 173H25V186H13Z"/>
+  <path d="M15 174V185M22 174V185" stroke="#d4bd89" stroke-width="1.6"/>
+  <circle cx="50" cy="701" r="10" fill="#9f3a3d"/><circle cx="50" cy="701" r="7" stroke="#f5eeeb" stroke-width=".7"/>
+  <path d="M47 695V707M50 695V707M53 695V707" stroke="#efdfdb" stroke-width=".8"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="avatar-title avatar-description">
+  <title id="avatar-title">Core and Frontier</title>
+  <desc id="avatar-description">由白色代码括号和白色字母组成的黑色圆形标识</desc>
+  <circle cx="80" cy="80" r="78" fill="#22272e" stroke="#fff" stroke-width="4"/>
+  <path d="M50 46 29 80l21 34" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="9"/>
+  <path d="m110 46 21 34-21 34" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="9"/>
+  <text x="80" y="91" fill="#f0f3f6" font-family="Menlo, Consolas, monospace" font-size="36" font-weight="700" text-anchor="middle">C&amp;F</text>
+</svg>

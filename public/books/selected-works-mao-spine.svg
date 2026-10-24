@@ -1,0 +1,11 @@
+<!-- 根据用户橙黄色封面重排：素纸与左侧装订痕，竖排墨字由页面字体呈现。 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="820" viewBox="0 0 100 820" preserveAspectRatio="none" fill="none">
+  <defs>
+    <linearGradient id="paper" x2="100" gradientUnits="userSpaceOnUse"><stop stop-color="#d89748"/><stop offset=".1" stop-color="#f0b366"/><stop offset=".24" stop-color="#ffca80"/><stop offset=".7" stop-color="#ffce89"/><stop offset="1" stop-color="#efb369"/></linearGradient>
+    <pattern id="grain" width="6" height="7" patternUnits="userSpaceOnUse"><path d="M0 2H6M2 5H5" stroke="#b07737" stroke-opacity=".08" stroke-width=".6"/></pattern>
+  </defs>
+  <path fill="url(#paper)" d="M0 0H100V820H0Z"/><path fill="url(#grain)" d="M0 0H100V820H0Z"/>
+  <path d="M7 0V820M12 0V820" stroke="#fff0c3" stroke-opacity=".65"/>
+  <path d="M17 0V820" stroke="#b47a36" stroke-width=".8" stroke-opacity=".35"/>
+  <path d="M94 0V820" stroke="#fff0c3" stroke-opacity=".3"/>
+</svg>

@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+  background: #fff;
+}
+
+body {
+  margin: 0;
+  color: #111827;
+  font-family: "IBM Plex Mono", monospace;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  color: #fff;
+  background: #1d4ed8;
+}
+
+section[id] {
+  scroll-margin-top: 5rem;
+}
+
+.section-shell {
+  padding: 2rem;
+}
+
+.section-kicker {
+  margin-bottom: 0.75rem;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.section-title {
+  color: #111827;
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.section-rule {
+  width: 75px;
+  height: 5px;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+}
+
+@media (min-width: 640px) {
+  .section-shell {
+    padding: 3rem;
+  }
+
+  .section-title {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .section-shell {
+    padding: 4rem;
+  }
+
+  .section-title {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-shell {
+    padding: 6rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .section-title {
+    font-size: 4.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
