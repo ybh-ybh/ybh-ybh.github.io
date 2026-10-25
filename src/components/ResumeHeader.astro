@@ -1,0 +1,112 @@
+---
+import ThemeSwitch from "./ThemeSwitch.astro";
+---
+
+<header class="resume-header" lang="zh-CN">
+  <nav class="resume-controls" aria-label="简历页面操作">
+    <a class="resume-home" href="/">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5m7-7-7 7 7 7" />
+      </svg>
+      <span>返回首页</span>
+    </a>
+    <div class="resume-theme"><ThemeSwitch /></div>
+  </nav>
+</header>
+
+<style>
+  /* 整个固定层保持透明并允许穿透，只有两端控件接收点击。 */
+  .resume-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 50;
+    padding: max(1rem, env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-right)) 0 max(1.5rem, env(safe-area-inset-left));
+    pointer-events: none;
+  }
+
+  .resume-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 77rem;
+    margin-inline: auto;
+  }
+
+  .resume-home,
+  .resume-theme { pointer-events: auto; }
+
+  .resume-home {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--page-bg);
+    color: var(--body-copy);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.5;
+    text-decoration: none;
+    transition: color 160ms ease, border-color 160ms ease, transform 160ms ease;
+  }
+
+  .resume-home:hover {
+    color: var(--accent-ink);
+    border-color: var(--accent-ink);
+    transform: translateY(-2px);
+  }
+
+  .resume-home:focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: 4px;
+  }
+
+  .resume-theme { display: flex; align-items: center; }
+
+  /* 尺寸调整只作用于简历页，首页继续使用原有开关外观。 */
+  .resume-theme :global(.switch) {
+    height: 44px;
+    border-color: var(--border-color);
+    background: var(--page-bg);
+  }
+
+  .resume-theme :global(.switch input) {
+    inset: -1px 0;
+    height: calc(100% + 2px);
+    min-height: 44px;
+  }
+
+  @supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
+    .resume-home,
+    .resume-theme :global(.switch) {
+      background: var(--header-glass);
+      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px);
+    }
+  }
+
+  /* 横向边距与简历正文一致，避免桌面控件贴住屏幕边缘。 */
+  @media (min-width: 640px) {
+    .resume-header {
+      padding-top: max(1.25rem, env(safe-area-inset-top));
+      padding-inline: max(3rem, env(safe-area-inset-left)) max(3rem, env(safe-area-inset-right));
+    }
+  }
+
+  @media (max-width: 359px) {
+    .resume-header { padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right)); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .resume-home { transition: none; }
+    .resume-home:hover { transform: none; }
+  }
+
+  @media (prefers-contrast: more) {
+    .resume-home,
+    .resume-theme :global(.switch) { background: var(--page-bg); border-color: var(--page-ink); }
+  }
+</style>

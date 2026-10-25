@@ -2,13 +2,16 @@
 import { siteConfig } from "../config";
 import KnowWhereFeatured from "./KnowWhereFeatured.astro";
 import ProjectRail from "./ProjectRail.astro";
+import LocalizedText from "./LocalizedText.astro";
+import { copy } from "../i18n";
 
 // 在此登记新项目，卡片、导航顺序和预览内容会一起更新。
 const projects = [
   {
     id: "project-knowwhere",
-    title: `${siteConfig.knowWhere.chineseName} / ${siteConfig.knowWhere.name}`,
-    summary: siteConfig.knowWhere.summary,
+    title: copy.project.name,
+    summary: copy.project.summary,
+    jumpLabel: copy.project.jump,
     Component: KnowWhereFeatured,
   },
 ];
@@ -16,7 +19,7 @@ const projects = [
 
 <section id="projects" class="section-shell" aria-labelledby="projects-title">
   <div class="mb-10 lg:mb-16">
-    <h2 id="projects-title" class="section-title">我的项目</h2>
+    <h2 id="projects-title" class="section-title"><LocalizedText text={copy.headings.projects} /></h2>
     <div class="section-rule" style={{ backgroundColor: siteConfig.accentColor }}></div>
   </div>
   <div class="space-y-10 lg:space-y-16">

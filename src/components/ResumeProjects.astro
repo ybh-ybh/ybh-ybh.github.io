@@ -1,0 +1,185 @@
+---
+import ResumeText from "./ResumeText.astro";
+import { resumeData } from "../data/resume";
+
+// 项目保持附件顺序，按钮只省略名称中的括号补充信息。
+const projects = resumeData.projects;
+---
+
+<div class="resume-project-switcher" data-resume-projects>
+  <div class="resume-project-tabs" data-project-tabs role="tablist" aria-label="选择项目" hidden>
+    {projects.map((project, index) => (
+      <button
+        type="button"
+        id={`resume-project-tab-${index}`}
+        class="resume-project-tab"
+        role="tab"
+        aria-controls={`resume-project-panel-${index}`}
+        aria-selected="false"
+        tabindex="-1"
+        data-project-tab
+      >
+        {project.project.split("（")[0]}
+      </button>
+    ))}
+  </div>
+
+  <div class="resume-project-panels">
+    {projects.map((project, index) => (
+      <article id={`resume-project-panel-${index}`} class="resume-project-panel" data-project-panel>
+        <div class="resume-project-heading">
+          <h3 class="resume-project-title">{project.project}</h3>
+          <p class="resume-project-date">{project.date}</p>
+        </div>
+        <ul class="resume-project-technologies" aria-label="技术栈">
+          {project.techStack.map((technology) => <li>{technology}</li>)}
+        </ul>
+        <p class="resume-project-copy resume-project-summary">{project.summary}</p>
+        <ul class="resume-project-copy resume-project-details">
+          {project.descriptions.map((description) => <li><ResumeText text={description} /></li>)}
+        </ul>
+      </article>
+    ))}
+  </div>
+</div>
+
+<script>
+  import { initResumeProjects } from "../scripts/resumeProjects";
+
+  initResumeProjects();
+</script>
+
+<style>
+  .resume-project-switcher { min-width: 0; }
+
+  .resume-project-tabs:not([hidden]) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .resume-project-tab {
+    min-width: 0;
+    min-height: 2.75rem;
+    padding: 0.7rem 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    color: var(--body-copy);
+    background: var(--surface-muted);
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 500;
+    line-height: 1.6;
+    text-align: left;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
+  }
+
+  .resume-project-tab:hover { color: var(--accent-ink); border-color: var(--accent-ink); }
+
+  .resume-project-tab[aria-selected="true"] {
+    border-color: var(--accent-ink);
+    color: var(--accent-ink);
+    background: color-mix(in srgb, var(--accent-ink) 8%, var(--surface-muted));
+    font-weight: 600;
+  }
+
+  .resume-project-tab:focus-visible,
+  .resume-project-panel:focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: 4px;
+    border-radius: 0.5rem;
+  }
+
+  /* 无脚本时连续展示全部内容，增强后保留最高项目的自然高度。 */
+  .resume-project-panel + .resume-project-panel {
+    margin-top: 1.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .resume-project-switcher[data-enhanced] .resume-project-panels { display: grid; }
+
+  .resume-project-switcher[data-enhanced] .resume-project-panel {
+    grid-area: 1 / 1;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    align-self: start;
+  }
+
+  /* 隐藏面板仅参与尺寸计算；脚本同步 aria-hidden 与 inert 阻止读屏和焦点进入。 */
+  .resume-project-switcher[data-enhanced] .resume-project-panel[aria-hidden="true"] {
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .resume-project-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.45rem 1.25rem;
+  }
+
+  .resume-project-title {
+    min-width: 0;
+    color: var(--page-ink);
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+  }
+
+  .resume-project-date {
+    flex-shrink: 0;
+    color: var(--muted-ink);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.7;
+  }
+
+  .resume-project-technologies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.85rem;
+  }
+
+  .resume-project-technologies > li {
+    max-width: 100%;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.3rem;
+    background: var(--surface-muted);
+    color: var(--body-copy);
+    font-size: 0.7rem;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  .resume-project-copy {
+    color: var(--body-copy);
+    font-size: 0.9375rem;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+
+  .resume-project-copy :global(strong) { color: var(--page-ink); font-weight: 600; }
+  .resume-project-summary { margin-top: 1.1rem; }
+
+  .resume-project-details {
+    list-style: disc;
+    margin-top: 1.1rem;
+    padding-left: 1.1rem;
+  }
+
+  .resume-project-details > li + li { margin-top: 0.8rem; }
+  .resume-project-details > li::marker { color: var(--muted-ink); font-size: 0.7em; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .resume-project-tab { transition: none; }
+  }
+</style>

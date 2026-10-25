@@ -103,6 +103,7 @@ export function initScrollScatter(): () => void {
 
   window.addEventListener("pageshow", refresh);
   window.addEventListener("load", refresh);
+  window.addEventListener("portfolio:languagechange", refresh);
   void document.fonts.ready.then(refresh);
   refresh();
 
@@ -112,6 +113,7 @@ export function initScrollScatter(): () => void {
     window.cancelAnimationFrame(refreshFrame);
     window.removeEventListener("pageshow", refresh);
     window.removeEventListener("load", refresh);
+    window.removeEventListener("portfolio:languagechange", refresh);
     media.revert();
   };
 }

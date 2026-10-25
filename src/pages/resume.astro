@@ -1,0 +1,506 @@
+---
+import { Image } from "astro:assets";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ResumeText from "../components/ResumeText.astro";
+import ResumeProjects from "../components/ResumeProjects.astro";
+import ResumeHero from "../components/ResumeHero.astro";
+import profileImage from "../assets/profile.png";
+import { resumeData } from "../data/resume";
+import { siteConfig } from "../config";
+
+// 技能只增加阅读分组，原有条目、内容与顺序均保留。
+const skillGroups = [
+  { title: "应用开发与 AI", items: resumeData.skills.slice(0, 6) },
+  { title: "数据与部署", items: resumeData.skills.slice(6, 9) },
+  { title: "工程实践与交付", items: resumeData.skills.slice(9) },
+];
+// 基本信息保留附件中的原始数值，不根据当前日期推算。
+const profileFacts = [
+  { label: "年龄", value: resumeData.profile.age },
+  { label: "工作年限", value: resumeData.profile.workYears },
+  { label: "学历", value: resumeData.profile.education },
+  { label: "到岗状态", value: resumeData.profile.availability },
+];
+// 简历页独立提供真实身份资料，不继承首页模板中的教育字段。
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: resumeData.profile.name,
+  url: "https://ybh-ybh.github.io/resume/",
+  jobTitle: resumeData.profile.title,
+  email: resumeData.profile.email,
+  sameAs: [siteConfig.social.github],
+};
+---
+
+<BaseLayout
+  title={`${resumeData.profile.name} - 我的简历`}
+  description={resumeData.profile.summary}
+  canonicalPath="/resume/"
+  homePath="/"
+  headerVariant="resume"
+  personSchema={personSchema}
+>
+  <div class="resume-shell grid-wrapper" lang="zh-CN">
+    <div class="grid-background" aria-hidden="true"></div>
+    <article lang="zh-CN" class="resume-page" aria-labelledby="resume-title">
+      <div class="resume-stage" data-resume-stage>
+        <div data-resume-retreat><ResumeHero /></div>
+      </div>
+      <div class="resume-overview">
+        <section id="resume-profile" class="resume-profile resume-glass" aria-label="基本信息">
+          <div class="resume-profile-content">
+            <div class="resume-profile-heading">
+              <div class="resume-identity">
+                <h2>{resumeData.profile.name}</h2>
+                <p class="resume-role">{resumeData.profile.title}</p>
+              </div>
+            </div>
+            <dl class="resume-facts">
+              {profileFacts.map((fact) => (
+                <div>
+                  <dt>{fact.label}</dt>
+                  <dd>{fact.value}</dd>
+                </div>
+              ))}
+            </dl>
+            <dl class="resume-contacts">
+              <div>
+                <dt>邮箱</dt>
+                <dd><button type="button" class="resume-contact" data-copy-email={resumeData.profile.email} aria-label={`复制邮箱 ${resumeData.profile.email}`}>{resumeData.profile.email}</button></dd>
+              </div>
+            </dl>
+          </div>
+          <Image src={profileImage} alt={`${resumeData.profile.name}的头像`} width={160} height={160} format="webp" quality={86} loading="lazy" class="resume-portrait" />
+        </section>
+
+        <section id="resume-skills" class="resume-skills resume-glass" aria-labelledby="resume-skills-title">
+          <h2 id="resume-skills-title" class="resume-section-title">专业技能</h2>
+          <div class="resume-skill-groups">
+            {skillGroups.map((group) => (
+              <div class="resume-skill-group">
+                <h3 class="resume-skill-title">{group.title}</h3>
+                <ul class="resume-list resume-copy">
+                  {group.items.map((skill) => <li><ResumeText text={skill} /></li>)}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <div class="resume-spread resume-experience">
+        <section id="resume-work" class="resume-column" aria-labelledby="resume-work-title">
+          <h2 id="resume-work-title" class="resume-section-title">工作经历</h2>
+          <div class="resume-entries">
+            {resumeData.workExperiences.map((work) => (
+              <div class="resume-entry">
+                <p class="resume-date">{work.date}</p>
+                <h3 class="resume-entry-title">{work.company}</h3>
+                <p class="resume-job-title">{work.jobTitle}</p>
+                {work.descriptions.length > 0 && (
+                  <ul class="resume-list resume-copy resume-entry-details">
+                    {work.descriptions.map((description) => <li><ResumeText text={description} /></li>)}
+                  </ul>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="resume-projects" class="resume-column resume-main-column" aria-labelledby="resume-projects-title">
+          <h2 id="resume-projects-title" class="resume-section-title">项目经历</h2>
+          <ResumeProjects />
+        </section>
+      </div>
+    </article>
+    <div class="resume-copy-toast" role="status" aria-live="polite" aria-atomic="true" data-copy-toast></div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { initResumeTransition } from "../scripts/resumeTransition";
+
+  // 滚动退场只作用于简历首屏，热更新时释放其固定层与动画。
+  const disposeResumeTransition = initResumeTransition();
+  if (import.meta.hot) import.meta.hot.dispose(disposeResumeTransition);
+
+  // 邮箱使用按钮交互，支持鼠标点击与键盘激活。
+  const emailButton = document.querySelector<HTMLButtonElement>("[data-copy-email]");
+  // 常驻状态区域向读屏软件同步复制结果。
+  const copyToast = document.querySelector<HTMLElement>("[data-copy-toast]");
+  // 重复复制时重新计算三秒展示时间。
+  let toastTimer: ReturnType<typeof setTimeout> | undefined;
+
+  // 仅在写入剪贴板成功后提示成功，失败时保留邮箱供手动复制。
+  async function copyEmail(): Promise<void> {
+    if (!emailButton || !copyToast) return;
+    emailButton.disabled = true;
+    clearTimeout(toastTimer);
+    copyToast.textContent = "";
+    try {
+      await navigator.clipboard.writeText(emailButton.dataset.copyEmail ?? "");
+      copyToast.dataset.state = "success";
+      copyToast.textContent = "邮箱复制成功";
+    } catch {
+      copyToast.dataset.state = "error";
+      copyToast.textContent = "复制失败，请手动复制邮箱";
+    } finally {
+      emailButton.disabled = false;
+      toastTimer = setTimeout(() => { copyToast.textContent = ""; }, 3000);
+    }
+  }
+
+  emailButton?.addEventListener("click", copyEmail);
+</script>
+
+<style>
+  /* 简历页统一使用微软雅黑，页头、正文与项目按钮共同继承。 */
+  :global(body:has(.resume-shell)) {
+    font-family: "Microsoft YaHei", "微软雅黑", sans-serif;
+  }
+
+  /* 网格独立铺满背景并向下淡出，不参与交互或遮挡正文。 */
+  .grid-wrapper {
+    --resume-grid-base: #f8fafc;
+    --resume-grid-line: #e2e8f0;
+    min-height: 100%;
+    width: 100%;
+    position: relative;
+    isolation: isolate;
+    background-color: var(--resume-grid-base);
+  }
+
+  :global(html[data-theme="dark"]) .grid-wrapper {
+    --resume-grid-base: #0c1220;
+    --resume-grid-line: #25344b;
+  }
+
+  .grid-background {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(to right, var(--resume-grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--resume-grid-line) 1px, transparent 1px);
+    background-size: 20px 30px;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%);
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%);
+  }
+
+  .resume-shell {
+    --resume-shell-top: 6.5rem;
+    padding: var(--resume-shell-top) 1.5rem 4rem;
+  }
+
+  .resume-page {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: 4.5rem;
+    max-width: 77rem;
+    margin-inline: auto;
+  }
+
+  /* 工作与项目仍以双栏留白组织，不受信息卡片布局影响。 */
+  .resume-spread {
+    display: grid;
+    gap: 2.5rem;
+  }
+
+  .resume-column { min-width: 0; }
+
+  /* 上方横幅完整展开，下方技能内收并无缝相接，形成主子卡片。 */
+  .resume-overview { position: relative; z-index: 2; min-width: 0; }
+  .resume-stage { position: relative; z-index: 0; min-width: 0; }
+  [data-resume-retreat] { transform-origin: 50% 45%; }
+
+  .resume-glass {
+    border: 1px solid var(--border-color);
+    /* 降低底色遮挡，并保留透过玻璃可辨认的模糊网格。 */
+    background: rgba(255, 255, 255, 0.34);
+    -webkit-backdrop-filter: blur(8px) saturate(135%);
+    backdrop-filter: blur(8px) saturate(135%);
+    box-shadow: 0 12px 40px -24px rgba(30, 55, 90, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+
+  :global(html[data-theme="dark"]) .resume-glass {
+    background: rgba(20, 30, 48, 0.42);
+    box-shadow: 0 16px 40px -24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .resume-profile {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 1.25rem;
+  }
+
+  .resume-profile-content { display: contents; }
+  .resume-profile-heading { grid-column: 1; grid-row: 1; }
+  .resume-profile .resume-portrait { grid-column: 2; grid-row: 1; }
+
+  .resume-skills {
+    margin-inline: 0.5rem;
+    padding: 1.75rem 1rem;
+    border-top: 0;
+    border-radius: 0 0 1.25rem 1.25rem;
+  }
+
+  .resume-main-column {
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .resume-profile-heading {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .resume-identity { min-width: 0; }
+
+  .resume-identity h2 {
+    color: var(--page-ink);
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.035em;
+  }
+
+  .resume-role {
+    margin-top: 0.35rem;
+    color: var(--accent-ink);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.7;
+  }
+
+  .resume-portrait {
+    width: 4.5rem;
+    height: 4.5rem;
+    flex-shrink: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 0.85rem;
+    object-fit: cover;
+  }
+
+  .resume-facts {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem 1rem;
+  }
+
+  .resume-facts > div { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.25rem 0.5rem; }
+
+  .resume-facts dt,
+  .resume-contacts dt {
+    color: var(--muted-ink);
+    font-size: 0.75rem;
+  }
+
+  .resume-facts dd {
+    margin-top: 0;
+    color: var(--page-ink);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .resume-contacts {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1rem;
+    font-size: 0.85rem;
+  }
+
+  .resume-contacts > div { min-width: 0; display: flex; align-items: baseline; gap: 0.5rem; }
+  .resume-contacts dd { min-width: 0; margin-top: 0; }
+
+  .resume-section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.4rem;
+    color: var(--page-ink);
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: -0.02em;
+  }
+
+  .resume-section-title::before {
+    content: "";
+    width: 3px;
+    height: 1.1em;
+    border-radius: 999px;
+    background: var(--accent-ink);
+  }
+
+  .resume-section-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    margin-left: 0.25rem;
+    background: var(--border-color);
+  }
+
+  .resume-copy {
+    color: var(--body-copy);
+    font-size: 0.9rem;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+
+  .resume-copy :global(strong) {
+    color: var(--page-ink);
+    font-weight: 600;
+  }
+
+  .resume-skill-group + .resume-skill-group { margin-top: 1.3rem; }
+
+  .resume-skill-title {
+    margin-bottom: 0.6rem;
+    color: var(--accent-ink);
+    font-size: 0.825rem;
+    font-weight: 600;
+  }
+
+  .resume-list {
+    list-style: disc;
+    padding-left: 1.1rem;
+  }
+
+  .resume-list > li + li { margin-top: 0.5rem; }
+
+  .resume-list > li::marker {
+    color: var(--muted-ink);
+    font-size: 0.7em;
+  }
+
+  .resume-entry + .resume-entry {
+    margin-top: 1.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--border-color);
+  }
+
+  .resume-entry-title {
+    margin-top: 0.5rem;
+    color: var(--page-ink);
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+  }
+
+  .resume-date {
+    color: var(--muted-ink);
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.7;
+  }
+
+  .resume-job-title {
+    margin-top: 0.4rem;
+    color: var(--accent-ink);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .resume-entry-details { margin-top: 1rem; }
+
+  .resume-contact {
+    cursor: pointer;
+    text-align: left;
+    color: var(--page-ink);
+    overflow-wrap: anywhere;
+    text-decoration: underline;
+    text-decoration-color: var(--border-color);
+    text-underline-offset: 0.25rem;
+  }
+
+  .resume-contact:hover {
+    color: var(--accent-ink);
+    text-decoration-color: currentColor;
+  }
+
+  .resume-shell a:focus-visible,
+  .resume-contact:focus-visible {
+    outline: 2px solid var(--accent-ink);
+    outline-offset: 4px;
+    border-radius: 3px;
+  }
+
+  /* 提示在顶部居中，并避开两端悬浮按钮，三秒后清空并隐藏。 */
+  .resume-copy-toast {
+    position: fixed;
+    z-index: 60;
+    top: calc(max(1.25rem, env(safe-area-inset-top)) + 3.75rem);
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100vw - 2rem);
+    width: max-content;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.75rem;
+    background: var(--resume-grid-base);
+    color: var(--page-ink);
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    font-size: 0.875rem;
+    pointer-events: none;
+  }
+
+  .resume-copy-toast:empty { visibility: hidden; }
+
+  .resume-copy-toast[data-state="success"] {
+    border-color: rgba(134, 239, 172, 0.7);
+    background: rgba(240, 253, 244, 0.94);
+    color: #166534;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 16px rgba(74, 222, 128, 0.2), 0 4px 24px rgba(34, 197, 94, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  @media (min-width: 640px) {
+    .resume-shell { --resume-shell-top: 7rem; padding: var(--resume-shell-top) 3rem 5rem; }
+    .resume-profile-heading { gap: 1.5rem; }
+    .resume-portrait { width: 6rem; height: 6rem; }
+    .resume-section-title { font-size: 1.45rem; }
+    .resume-profile { padding: 1.5rem 2rem; gap: 2rem; align-items: center; }
+    .resume-profile-content { display: block; min-width: 0; }
+    .resume-profile .resume-portrait { width: 6rem; height: 6rem; }
+    .resume-facts { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-top: 1rem; }
+    .resume-contacts { margin-top: 0.5rem; }
+    .resume-contacts > div { display: flex; align-items: baseline; gap: 0.75rem; }
+    .resume-contacts dd { margin-top: 0; }
+    .resume-skills { margin-inline: 1.5rem; padding: 2rem 2.5rem 2.5rem; }
+  }
+
+  /* 工作经历与项目经历继续使用桌面三七比例。 */
+  @media (min-width: 1024px) {
+    .resume-page { gap: 6rem; }
+    .resume-spread {
+      grid-template-columns: minmax(0, 3fr) minmax(0, 7fr);
+      gap: 0;
+      min-height: calc(100svh - 10rem);
+    }
+    .resume-spread > .resume-column:first-child { padding-right: 2.25rem; }
+    .resume-main-column {
+      padding-top: 0;
+      padding-left: 3rem;
+      border-top: 0;
+    }
+    .resume-role { font-size: 1rem; }
+  }
+
+  @media (max-width: 359px) {
+    .resume-shell { padding-inline: 1.25rem; }
+    .resume-profile-heading { gap: 0.75rem; }
+    .resume-portrait { width: 3.5rem; height: 3.5rem; }
+  }
+</style>

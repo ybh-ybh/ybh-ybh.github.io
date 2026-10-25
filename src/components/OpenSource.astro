@@ -1,9 +1,9 @@
 ---
 import { siteConfig } from "../config";
+import LocalizedText from "./LocalizedText.astro";
+import { copy } from "../i18n";
 // 恢复下方贡献模板时，同时启用图标导入和 config.ts 中的模板配置。
 // import whisperIcon from "../icon/whisperkit-argmax-black@120.png";
-// 当前展示的开源贡献内容。
-const project = siteConfig.openSource;
 // 沿用站点强调色。
 const accent = siteConfig.accentColor;
 ---
@@ -11,7 +11,7 @@ const accent = siteConfig.accentColor;
 <section id="opensource" class="section-shell">
   <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-16">
     <div class="lg:col-span-4">
-      <h2 class="section-title">开源贡献</h2>
+      <h2 class="section-title"><LocalizedText text={copy.headings.opensource} /></h2>
       <div class="section-rule" style={{ backgroundColor: accent }}></div>
     </div>
 
@@ -54,7 +54,7 @@ const accent = siteConfig.accentColor;
     */}
 
     <article class="min-w-0 rounded-2xl border border-gray-200/60 dark:border-slate-700 bg-[var(--surface-muted)] p-6 text-gray-500 dark:text-slate-400 sm:p-8 lg:col-span-8">
-      <h3 class="text-lg font-medium sm:text-xl">{project.description}</h3>
+      <h3 class="text-lg font-medium sm:text-xl"><LocalizedText text={copy.openSource} /></h3>
     </article>
   </div>
 </section>

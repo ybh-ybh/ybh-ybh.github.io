@@ -2,6 +2,8 @@
 import { Image } from "astro:assets";
 import { siteConfig } from "../config";
 import archivePreview from "../assets/knowwhere-bitable-preview.png";
+import LocalizedText from "./LocalizedText.astro";
+import { copy, localizedAttrs } from "../i18n";
 
 interface Props {
   id: string;
@@ -27,34 +29,34 @@ const accent = siteConfig.accentColor;
               <path d="M12 12V20M12 12L20 8.5M12 12L4 8.5" />
             </svg>
           </span>
-          <p class="text-xs font-semibold leading-relaxed text-gray-500 dark:text-slate-400 sm:text-sm">{project.label}</p>
+          <p class="text-xs font-semibold leading-relaxed text-gray-500 dark:text-slate-400 sm:text-sm"><LocalizedText text={copy.project.label} /></p>
         </div>
 
         <h2 id="knowwhere-title" class="mt-7 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-3xl font-bold leading-tight tracking-tight text-gray-900 dark:text-slate-100 sm:text-4xl xl:text-5xl">
-          <span class="whitespace-nowrap">{project.chineseName} <span class="font-normal text-gray-400">/</span></span>
+          <span data-locale="zh-CN" class="whitespace-nowrap">{project.chineseName} <span class="font-normal text-gray-400">/</span></span>
           <span>{project.name}</span>
         </h2>
-        <p class="mt-4 text-lg font-semibold leading-relaxed" style={{ color: "var(--accent-ink)" }}>{project.tagline}</p>
-        <p class="mt-5 text-base leading-relaxed text-gray-600 dark:text-slate-300 sm:text-lg">{project.summary}</p>
+        <p class="mt-4 text-lg font-semibold leading-relaxed" style={{ color: "var(--accent-ink)" }}><LocalizedText text={copy.project.tagline} /></p>
+        <p class="mt-5 text-base leading-relaxed text-gray-600 dark:text-slate-300 sm:text-lg"><LocalizedText text={copy.project.summary} /></p>
         <p class="mt-5 text-xs leading-6 text-gray-500 dark:text-slate-400 sm:text-sm">
-          <span class="font-semibold text-gray-700 dark:text-slate-300">支持来源：</span>{project.sources.join("、")}。
+          <span class="font-semibold text-gray-700 dark:text-slate-300"><LocalizedText text={copy.project.sourcesLabel} /></span><LocalizedText text={copy.project.sources} />
         </p>
 
         <div class="mt-7 flex flex-wrap gap-3">
           <a href={project.website} target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700" style={{ backgroundColor: accent }}>
-            查看项目 ↗
+            <LocalizedText text={copy.project.website} />
           </a>
           <a href={project.repo} target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center rounded-lg border border-blue-100 dark:border-slate-700 bg-white/80 dark:bg-slate-800/80 px-5 py-3 text-sm font-semibold text-gray-700 dark:text-slate-300 transition-all hover:-translate-y-0.5 hover:bg-white dark:hover:bg-slate-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-700">
-            GitHub 源码 ↗
+            <LocalizedText text={copy.project.repo} />
           </a>
         </div>
       </div>
 
       <div class="min-w-0 rounded-2xl border border-white dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-[0_8px_24px_-12px_rgba(30,64,175,0.16)] sm:p-7">
-        <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100">从链接到知识库</h3>
-        <ol class="mt-6 space-y-5" aria-label="知归内容归档流程">
+        <h3 class="text-base font-semibold text-gray-900 dark:text-slate-100"><LocalizedText text={copy.project.flow} /></h3>
+        <ol class="mt-6 space-y-5" {...localizedAttrs("aria-label", copy.project.flowLabel)}>
           {/* 步骤和序号对应真实的归档顺序。 */}
-          {project.steps.map((step, index) => (
+          {copy.project.steps.map((step, index) => (
             <li class="relative flex items-start gap-3 sm:gap-4">
               {index < project.steps.length - 1 && (
                 <span aria-hidden="true" class="absolute bottom-[-1.25rem] left-4 top-8 border-l border-dashed border-blue-100 dark:border-slate-700"></span>
@@ -63,8 +65,8 @@ const accent = siteConfig.accentColor;
                 {String(index + 1).padStart(2, "0")}
               </span>
               <div class="min-w-0 pt-1">
-                <p class="text-sm font-semibold text-gray-900 dark:text-slate-100 sm:text-base">{step.title}</p>
-                <p class="mt-1 text-xs leading-relaxed text-gray-500 dark:text-slate-400 sm:text-sm">{step.description}</p>
+                <p class="text-sm font-semibold text-gray-900 dark:text-slate-100 sm:text-base"><LocalizedText text={step.title} /></p>
+                <p class="mt-1 text-xs leading-relaxed text-gray-500 dark:text-slate-400 sm:text-sm"><LocalizedText text={step.description} /></p>
               </div>
             </li>
           ))}
@@ -77,7 +79,7 @@ const accent = siteConfig.accentColor;
       <div class="overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-2 shadow-[0_20px_48px_-24px_rgba(30,64,175,0.28)] sm:rounded-2xl sm:p-3">
         <Image
           src={archivePreview}
-          alt="知归飞书多维表格实际归档界面，展示平台、分类、摘要与阅读状态"
+          {...localizedAttrs("alt", copy.project.screenshot)}
           format="webp"
           quality={90}
           class="block h-auto w-full rounded-lg sm:rounded-xl"
@@ -85,7 +87,7 @@ const accent = siteConfig.accentColor;
         />
       </div>
       <figcaption class="mt-3 text-center text-xs leading-relaxed text-gray-500 dark:text-slate-400">
-        飞书多维表格实际归档效果
+        <LocalizedText text={copy.project.caption} />
       </figcaption>
     </figure>
   </div>

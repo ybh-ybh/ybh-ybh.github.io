@@ -1,23 +1,25 @@
 ---
 import { siteConfig } from "../config";
+import LocalizedText from "./LocalizedText.astro";
+import { copy } from "../i18n";
 ---
 
 <section id="about" data-scatter-section class="section-shell">
   <div class="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-16">
     <div data-scatter-item data-scatter-side="left" class="lg:col-span-4">
       <div data-scatter-motion>
-        <h2 class="section-title">关于我</h2>
+        <h2 class="section-title"><LocalizedText text={copy.headings.about} /></h2>
         <div class="section-rule" style={{ backgroundColor: siteConfig.accentColor }}></div>
       </div>
     </div>
 
     <div class="space-y-8 lg:col-span-8">
       <div data-scatter-group class="space-y-5">
-        {siteConfig.about.map((paragraph, index) => (
+        {copy.about.map((paragraph, index) => (
           <div data-scatter-item data-scatter-side="right">
             <div data-scatter-motion>
               <p class:list={["leading-relaxed text-gray-600 dark:text-slate-300", index === 0 ? "text-lg sm:text-xl md:text-2xl" : "text-base sm:text-lg"]}>
-                {paragraph}
+                <LocalizedText text={paragraph} />
               </p>
             </div>
           </div>
@@ -29,7 +31,7 @@ import { siteConfig } from "../config";
         {siteConfig.capabilityGroups.map((group, index) => (
           <div data-scatter-item data-scatter-side={index % 2 === 0 ? "left" : "right"} class="min-w-0">
             <div data-scatter-motion class="h-full rounded-2xl border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5">
-              <h3 class="text-sm font-bold text-gray-900 dark:text-slate-100">{group.name}</h3>
+              <h3 class="text-sm font-bold text-gray-900 dark:text-slate-100"><LocalizedText text={copy.capabilityGroups[index]} /></h3>
               <div class="mt-3 flex flex-wrap gap-2">
                 {group.skills.map((skill) => (
                   <span class="inline-flex max-w-full items-center gap-1.5 whitespace-nowrap rounded-md bg-gray-100 dark:bg-slate-700 px-2.5 py-1 text-xs font-medium text-gray-700 dark:text-slate-300">

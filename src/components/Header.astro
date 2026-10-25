@@ -2,18 +2,28 @@
 import { siteConfig } from "../config";
 import ThemeSwitch from "./ThemeSwitch.astro";
 import HeaderSea from "./HeaderSea.astro";
+import LanguageSwitch from "./LanguageSwitch.astro";
+import LocalizedText from "./LocalizedText.astro";
+import { copy } from "../i18n";
 
 interface Props {
   homePath?: string;
+  // 子页面可提供独立的页内导航，缺省时保留首页双语导航。
+  navLinks?: Array<{ label: string; href: string }>;
+  // 固定中文的子页面可关闭语言切换入口。
+  showLanguageSwitch?: boolean;
 }
 
-const { homePath = "" } = Astro.props;
+// 由页面显式决定导航内容，不依赖当前访问路径。
+const { homePath = "", navLinks, showLanguageSwitch = true } = Astro.props;
+// 首页导航可在子页面中指向首页的对应章节。
 const href = (hash: string) => `${homePath}${hash}`;
-const links = [
-  { label: "关于", href: href("#about") },
-  { label: "我的项目", href: href("#projects") },
-  { label: "开源贡献", href: href("#opensource") },
-  { label: "书籍", href: href("#books") },
+// 桌面和手机菜单共用同一份导航，避免链接内容不一致。
+const links = navLinks ?? [
+  { label: copy.nav.about, href: href("#about") },
+  { label: copy.nav.projects, href: href("#projects") },
+  { label: copy.nav.opensource, href: href("#opensource") },
+  { label: copy.nav.books, href: href("#books") },
 ];
 ---
 
@@ -23,18 +33,18 @@ const links = [
   data-at-top="true"
 >
   <HeaderSea />
-  <nav class="mx-auto flex max-w-7xl items-center justify-end px-5 py-3 md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:px-8 md:py-4">
-    <ul class="hidden items-center justify-center gap-7 lg:gap-8 md:col-start-2 md:flex">
+  <nav class="mx-auto flex max-w-7xl items-center justify-end px-5 py-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:px-8 md:py-4">
+    <ul class="hidden items-center justify-center gap-7 xl:gap-8 lg:col-start-2 lg:flex">
       {links.map((link) => (
         <li>
           <a href={link.href} class="font-medium text-gray-700 dark:text-slate-300 transition-colors hover:text-black dark:hover:text-white">
-            {link.label}
+            {typeof link.label === "string" ? <span lang="zh-CN">{link.label}</span> : <LocalizedText text={link.label} />}
           </a>
         </li>
       ))}
     </ul>
 
-    <div class="flex items-center gap-3 md:col-start-3 md:justify-self-end">
+    <div class="header-actions flex items-center gap-3 lg:col-start-3 lg:justify-self-end">
       <a
         href={siteConfig.social.github}
         target="_blank"
@@ -48,10 +58,11 @@ const links = [
         <span class="hidden sm:inline">GitHub</span>
       </a>
       <ThemeSwitch />
+      {showLanguageSwitch && <LanguageSwitch />}
       <button
         id="mobile-menu-button"
         type="button"
-        class="inline-flex size-10 items-center justify-center rounded-full border border-gray-300 dark:border-slate-600 bg-white/90 dark:bg-slate-800/90 text-gray-800 dark:text-slate-100 md:hidden"
+        class="inline-flex size-10 items-center justify-center rounded-full border border-gray-300 dark:border-slate-600 bg-white/90 dark:bg-slate-800/90 text-gray-800 dark:text-slate-100 lg:hidden"
         aria-controls="mobile-menu"
         aria-expanded="false"
         aria-label="打开导航菜单"
@@ -64,11 +75,11 @@ const links = [
   </nav>
 
   <!-- 菜单独立悬浮，避免撑高导航毛玻璃并遮住卡片外的页面。 -->
-  <div id="mobile-menu" class="absolute inset-x-0 top-full mx-4 hidden rounded-2xl border border-gray-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-3 shadow-xl backdrop-blur md:hidden">
+  <div id="mobile-menu" class="absolute inset-x-0 top-full mx-4 hidden rounded-2xl border border-gray-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 p-3 shadow-xl backdrop-blur lg:hidden">
     <div class="grid grid-cols-2 gap-1">
       {links.map((link) => (
         <a href={link.href} class="rounded-xl px-4 py-3 text-sm font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800">
-          {link.label}
+          {typeof link.label === "string" ? <span lang="zh-CN">{link.label}</span> : <LocalizedText text={link.label} />}
         </a>
       ))}
     </div>
@@ -146,6 +157,7 @@ const links = [
 </style>
 
 <script>
+  import { currentLocale } from "../scripts/language";
   // 获取固定导航容器，用于同步阅读进度和顶部透明状态。
   const header = document.querySelector<HTMLElement>(".site-header");
   // 手机菜单按钮独立控制菜单开合，不改变导航背景。
@@ -159,6 +171,13 @@ const links = [
   // 防止字体加载等异步回调唤醒已销毁实例。
   let disposed = false;
 
+  // 菜单开合与语言变化均根据当前状态生成操作提示。
+  const updateMenuLabel = () => {
+    // 由真实展开状态决定下一步动作。
+    const open = button?.getAttribute("aria-expanded") === "true";
+    button?.setAttribute("aria-label", currentLocale() === "en" ? (open ? "Close navigation menu" : "Open navigation menu") : (open ? "关闭导航菜单" : "打开导航菜单"));
+  };
+
   // 使用页面实际可滚动距离计算进度，与最右侧滚动条同步。
   const updateHeader = () => {
     if (!header || disposed) return;
@@ -169,6 +188,8 @@ const links = [
       ? (range - window.scrollY <= 1 ? 1 : Math.min(1, window.scrollY / range)) : 0;
     header.style.setProperty("--header-progress", progress.toFixed(5));
     header.dataset.atTop = String(window.scrollY <= 16);
+    // 装饰裁切在操作区左侧，适应新增按钮与响应式宽度。
+    header.style.setProperty("--header-actions-left", `${document.querySelector(".header-actions")?.getBoundingClientRect().left ?? 0}px`);
   };
 
   // 只调度一个渲染帧，进度不额外延迟或接管原生滚动。
@@ -188,18 +209,22 @@ const links = [
   observer.observe(document.body);
   void document.fonts.ready.then(scheduleUpdate);
   updateHeader();
+  updateMenuLabel();
+  window.addEventListener("portfolio:languagechange", () => { updateMenuLabel(); scheduleUpdate(); }, { signal: events.signal });
 
   button?.addEventListener("click", () => {
     // 仅切换菜单显示，背景与海面装饰保持当前滚动状态。
     const isOpen = button.getAttribute("aria-expanded") === "true";
     button.setAttribute("aria-expanded", String(!isOpen));
     menu?.classList.toggle("hidden", isOpen);
+    updateMenuLabel();
   }, { signal: events.signal });
 
   menu?.querySelectorAll("a").forEach((link) => {
     link.addEventListener("click", () => {
       menu.classList.add("hidden");
       button?.setAttribute("aria-expanded", "false");
+      updateMenuLabel();
     }, { signal: events.signal });
   });
 

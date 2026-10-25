@@ -1,3 +1,5 @@
+import { currentLocale } from "./language";
+
 // 同步导航开关、系统偏好与本地主题选择，并返回局部清理方法。
 export function initTheme(): () => void {
   // 与头部首屏初始化共用存储键，仅保存主题名称。
@@ -32,7 +34,8 @@ export function initTheme(): () => void {
     document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#0c1220" : "#ffffff");
     switches.forEach((input) => {
       input.checked = theme === "light";
-      input.closest("label")?.setAttribute("title", theme === "light" ? "切换到深色主题" : "切换到浅色主题");
+      input.setAttribute("aria-label", currentLocale() === "en" ? "Light theme" : "浅色主题");
+      input.closest("label")?.setAttribute("title", currentLocale() === "en" ? (theme === "light" ? "Switch to dark theme" : "Switch to light theme") : (theme === "light" ? "切换到深色主题" : "切换到浅色主题"));
     });
   };
 
@@ -106,6 +109,8 @@ export function initTheme(): () => void {
     showTheme();
   }, { signal: controller.signal });
   window.addEventListener("pageshow", () => showTheme(), { signal: controller.signal });
+  // 语言变化结束旧主题快照，并按最新语言同步当前状态。
+  window.addEventListener("portfolio:languagechange", () => showTheme(), { signal: controller.signal });
   applyTheme();
   // 热更新仅取消本模块过渡；失效回调不能再修改主题。
   return () => {

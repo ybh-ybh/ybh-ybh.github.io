@@ -1,0 +1,11 @@
+---
+import type { LocalizedText } from "../i18n";
+
+interface Props {
+  text: LocalizedText;
+}
+
+// 仅输出文本叶子，父级控件、锚点和动画节点始终保持同一份。
+const { text } = Astro.props;
+---
+<span data-locale="zh-CN">{text["zh-CN"]}</span><span data-locale="en">{text.en}</span>

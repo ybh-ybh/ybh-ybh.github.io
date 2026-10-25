@@ -1,4 +1,7 @@
 ---
+import LocalizedText from "./LocalizedText.astro";
+import { bilingual, bookDetails, copy, localizedAttrs } from "../i18n";
+
 interface Book {
   title: string;
   spineAuthor: string;
@@ -24,12 +27,12 @@ const { items } = Astro.props;
 const expandedGrow = items.length > 1 ? (0.45 * (items.length - 1)) / 0.55 : 1;
 ---
 
-<div class="book-shelf" data-book-shelf data-active="0" role="group" aria-label="推荐书架" style={{ "--book-expanded-grow": expandedGrow }}>
+<div class="book-shelf" data-book-shelf data-active="0" role="group" {...localizedAttrs("aria-label", copy.books.label)} style={{ "--book-expanded-grow": expandedGrow }}>
   <div class="book-shelf-scroll">
     <div class="book-track">
       {items.map((book, index) => (
         <div class:list={["book", { "book-placeholder": !book }]} data-book>
-          <input class="book-select sr-only" type="radio" name="recommended-books" id={`book-option-${index}`} checked={index === 0} aria-label={book ? `${book.title}，${book.authors}` : `第 ${index + 1} 本书，待补充`} aria-controls={`book-page-${index}`} />
+          <input class="book-select sr-only" type="radio" name="recommended-books" id={`book-option-${index}`} checked={index === 0} {...localizedAttrs("aria-label", bilingual(book ? `${book.title}，${book.authors}` : `第 ${index + 1} 本书，待补充`, book ? `${bookDetails[index]!.title.en}, ${bookDetails[index]!.authors.en}` : `Book ${index + 1}, coming soon`))} aria-controls={`book-page-${index}`} />
           <label class:list={["book-spine", { "book-spine-illustrated": book?.spineArtwork }, book?.spineVariant && `book-spine-${book.spineVariant}`]} for={`book-option-${index}`} style={book?.spineArtwork ? { backgroundImage: `url(${book.spineArtwork})`, "--book-spine-ink": book.spineInk, "--book-spine-muted": book.spineMutedInk } : undefined}>
             {book && <>
               {book.spineEnglishTitle && <span class="book-spine-english" aria-hidden="true">{book.spineEnglishTitle}</span>}
@@ -41,10 +44,10 @@ const expandedGrow = items.length > 1 ? (0.45 * (items.length - 1)) / 0.55 : 1;
           </label>
           <div id={`book-page-${index}`} class="book-page" data-book-page>
             {book && <>
-              <p class="book-category">{book.category}</p>
-              <h3>{book.title}</h3>
-              <p class="book-authors">{book.authors}</p>
-              <p class="book-description">{book.description}</p>
+              <p class="book-category"><LocalizedText text={bookDetails[index]!.category} /></p>
+              <h3><LocalizedText text={bookDetails[index]!.title} /></h3>
+              <p class="book-authors"><LocalizedText text={bookDetails[index]!.authors} /></p>
+              <p class="book-description"><LocalizedText text={bookDetails[index]!.description} /></p>
             </>}
           </div>
         </div>

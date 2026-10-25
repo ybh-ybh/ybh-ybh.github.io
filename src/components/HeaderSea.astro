@@ -135,8 +135,8 @@
   }
 
   /* 窄屏利用左侧空白放置海面装饰，与右侧操作按钮保持间距。 */
-  @media (max-width: 767px) {
-    .header-sea { left: 16px; width: min(160px, calc(100vw - 224px)); }
+  @media (max-width: 1023px) {
+    .header-sea { left: 16px; width: min(160px, max(0px, calc(var(--header-actions-left, 16px) - 28px))); }
     .sea-boat { left: 6px; width: 24px; height: 21px; bottom: calc(var(--header-progress, 0) * 100% - 5px); }
     .sea-gull { width: 12px; height: 8px; }
     .gull-two { left: 48%; width: 9px; }

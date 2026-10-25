@@ -1,19 +1,21 @@
 ---
 import { siteConfig } from "../config";
+import LocalizedText from "./LocalizedText.astro";
+import { copy, localizedAttrs, type LocalizedText as Translation } from "../i18n";
 
 interface Props {
-  items: { id: string; title: string; summary: string }[];
+  items: { id: string; title: Translation; summary: Translation; jumpLabel: Translation }[];
 }
 
 // 导航直接消费项目列表，不额外维护一套名称和顺序。
 const { items } = Astro.props;
 ---
 
-<nav class="project-rail" data-project-rail data-visible="false" aria-label="项目导航" aria-hidden="true" inert style={{ "--project-accent": siteConfig.accentColor }}>
+<nav class="project-rail" data-project-rail data-visible="false" {...localizedAttrs("aria-label", copy.project.navigation)} aria-hidden="true" inert style={{ "--project-accent": siteConfig.accentColor }}>
   <ol class="project-rail-list" data-project-rail-list>
     {items.map((item) => (
       <li>
-        <a class="project-rail-link" href={`#${item.id}`} draggable="false" data-project-link data-preview-id={`preview-${item.id}`} aria-label={`跳转到${item.title}`}>
+        <a class="project-rail-link" href={`#${item.id}`} draggable="false" data-project-link data-preview-id={`preview-${item.id}`} {...localizedAttrs("aria-label", item.jumpLabel)}>
           <span class="project-rail-tick" aria-hidden="true"></span>
         </a>
       </li>
@@ -22,8 +24,8 @@ const { items } = Astro.props;
   <p class="project-rail-count" data-project-current aria-hidden="true">01</p>
   {items.map((item) => (
     <div id={`preview-${item.id}`} class="project-rail-preview" data-project-preview data-open="false" role="tooltip" aria-hidden="true">
-      <p class="project-rail-title">{item.title}</p>
-      <p class="project-rail-summary">{item.summary}</p>
+      <p class="project-rail-title"><LocalizedText text={item.title} /></p>
+      <p class="project-rail-summary"><LocalizedText text={item.summary} /></p>
     </div>
   ))}
 </nav>

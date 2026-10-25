@@ -201,6 +201,8 @@ export function initProjectRail(): () => void {
 
   window.addEventListener("scroll", schedule, { passive: true, signal: controller.signal });
   window.addEventListener("resize", schedule, { signal: controller.signal });
+  // 双语正文换行后刷新当前预览位置，保留高亮及悬停状态。
+  window.addEventListener("portfolio:languagechange", schedule, { signal: controller.signal });
   window.addEventListener("pageshow", schedule, { signal: controller.signal });
   window.addEventListener("load", schedule, { signal: controller.signal });
   desktop.addEventListener("change", schedule, { signal: controller.signal });

@@ -1,7 +1,9 @@
 ---
 import Header from "../components/Header.astro";
+import ResumeHeader from "../components/ResumeHeader.astro";
 import Footer from "../components/Footer.astro";
 import { siteConfig } from "../config";
+import { bilingual, copy, localizedAttrs } from "../i18n";
 import "../styles/global.css";
 
 interface Props {
@@ -9,16 +11,30 @@ interface Props {
   description?: string;
   canonicalPath?: string;
   homePath?: string;
+  // 简历页使用两端悬浮控件，其他页面默认保留完整导航。
+  headerVariant?: "default" | "resume";
+  // 允许子页面替换顶部导航，首页未传入时保持原有内容。
+  navLinks?: Array<{ label: string; href: string }>;
+  // 将子页面的语言入口设置传递给共享页头。
+  showLanguageSwitch?: boolean;
+  // 子页面可完整提供自己的身份资料，避免继承默认模板字段。
+  personSchema?: Record<string, unknown>;
 }
 
+// 自定义身份资料只作用于当前页面，其余参数保留原有默认值。
 const {
   title = `${siteConfig.name} - 个人简介`,
   description = siteConfig.description,
   canonicalPath = "/",
   homePath = "",
+  headerVariant = "default",
+  navLinks,
+  showLanguageSwitch = true,
+  personSchema: customPersonSchema,
 } = Astro.props;
 const canonical = new URL(canonicalPath, "https://ybh-ybh.github.io").toString();
-const personSchema = {
+// 首页继续使用原有身份资料，子页面覆盖时不合并默认字段。
+const defaultPersonSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: siteConfig.name,
@@ -27,6 +43,14 @@ const personSchema = {
   alumniOf: { "@type": "CollegeOrUniversity", name: "武汉大学" },
   sameAs: [siteConfig.social.github, siteConfig.social.douyin],
 };
+// 初始静态输出和中文切换使用同一份页面资料。
+const personSchema = customPersonSchema ?? defaultPersonSchema;
+// 保留布局原有覆盖能力，首页默认元信息采用集中双语文案。
+const localizedTitle = title === `${siteConfig.name} - 个人简介` ? copy.pageTitle : bilingual(title, title);
+// 自定义描述由调用方拥有，默认描述随语言同步。
+const localizedDescription = description === siteConfig.description ? copy.description : bilingual(description, description);
+// 英文身份资料复用相同链接和结构。
+const englishPersonSchema = customPersonSchema ?? { ...defaultPersonSchema, name: copy.name.en, jobTitle: copy.title.en, alumniOf: { ...defaultPersonSchema.alumniOf, name: copy.university.en } };
 ---
 
 <!doctype html>
@@ -35,11 +59,15 @@ const personSchema = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="description" content={description} />
+    <meta name="description" {...localizedAttrs("content", localizedDescription)} />
     <meta name="theme-color" content="#ffffff" />
     <script is:inline>
       // 在样式和正文绘制前恢复主题，避免深色刷新时先闪出白色。
       (() => {
+        // 在正文绘制前恢复语言，避免英文刷新时短暂显示中文。
+        let savedLanguage = null;
+        try { savedLanguage = localStorage.getItem("portfolio-language"); } catch {}
+        document.documentElement.lang = savedLanguage === "en" ? "en" : "zh-CN";
         // 无手动选择时跟随系统，浏览器禁用存储也可正常显示。
         let savedTheme = null;
         try { savedTheme = localStorage.getItem("portfolio-theme"); } catch {}
@@ -59,18 +87,38 @@ const personSchema = {
       rel="stylesheet"
     />
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content="zh_CN" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+    <meta property="og:locale" {...localizedAttrs("content", bilingual("zh_CN", "en_US"))} />
+    <meta property="og:title" {...localizedAttrs("content", localizedTitle)} />
+    <meta property="og:description" {...localizedAttrs("content", localizedDescription)} />
     <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify(personSchema)} />
-    <title>{title}</title>
+    <meta name="twitter:title" {...localizedAttrs("content", localizedTitle)} />
+    <meta name="twitter:description" {...localizedAttrs("content", localizedDescription)} />
+    <script is:inline type="application/ld+json" data-person-schema data-schema-zh={JSON.stringify(personSchema)} data-schema-en={JSON.stringify(englishPersonSchema)} set:html={JSON.stringify(personSchema)} />
+    <title data-i18n-text={JSON.stringify(localizedTitle)}>{title}</title>
+    <script is:inline>
+      // 在正文前同步元信息；客户端初始化后继续使用相同数据标记。
+      (() => {
+        // 语言已由首屏恢复逻辑校验。
+        const locale = document.documentElement.lang;
+        document.querySelectorAll("[data-i18n-attributes]").forEach((element) => {
+          // 属性字典由构建阶段生成。
+          const attributes = JSON.parse(element.dataset.i18nAttributes);
+          Object.entries(attributes).forEach(([name, text]) => element.setAttribute(name, text[locale]));
+        });
+        document.querySelectorAll("[data-i18n-text]").forEach((element) => {
+          element.textContent = JSON.parse(element.dataset.i18nText)[locale];
+        });
+        // 结构化数据只同步语言相关字段。
+        const schema = document.querySelector("[data-person-schema]");
+        schema.textContent = schema.dataset[locale === "en" ? "schemaEn" : "schemaZh"];
+      })();
+    </script>
   </head>
   <body>
-    <Header homePath={homePath} />
+    {headerVariant === "resume"
+      ? <ResumeHeader />
+      : <Header homePath={homePath} navLinks={navLinks} showLanguageSwitch={showLanguageSwitch} />}
     <main><slot /></main>
     <Footer />
   </body>

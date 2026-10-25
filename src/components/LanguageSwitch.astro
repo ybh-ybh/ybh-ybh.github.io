@@ -1,0 +1,19 @@
+<button type="button" class="language-switch border border-gray-300 dark:border-slate-600 bg-white/80 dark:bg-slate-800/80 text-gray-800 dark:text-slate-100 transition-all hover:-translate-y-0.5 hover:border-gray-500" data-language-toggle title="切换到英文" aria-label="切换到英文" disabled>
+  <span class="language-track"><span data-locale="zh-CN">CN</span><span data-locale="en">EN</span></span>
+</button>
+
+<style>
+  /* 与日月开关使用同一外框尺寸，透明命中区保证至少 44px 高。 */
+  .language-switch { position: relative; flex-shrink: 0; width: 64px; height: 38.8px; padding: 3px; border-radius: 30px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .language-switch::before { position: absolute; content: ""; inset: -4px 0; }
+  .language-track { display: flex; height: 100%; align-items: center; justify-content: center; border-radius: inherit; background: var(--surface-muted); transition: background-color .4s; }
+  .language-switch:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 4px; }
+</style>
+
+<script>
+  import { initLanguage } from "../scripts/language";
+
+  // 语言模块独立清理事件，避免热更新重复绑定。
+  const disposeLanguage = initLanguage();
+  if (import.meta.hot) import.meta.hot.dispose(disposeLanguage);
+</script>

@@ -2,6 +2,16 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
+/* 首屏仅显示已恢复的语言，禁用脚本时静态中文仍完整可读。 */
+html:not([lang="en"]) [data-locale="en"],
+html[lang="en"] [data-locale="zh-CN"] { display: none; }
+
+/* 英文标题允许自然换行，避免挤压头像或撑出窄屏视口。 */
+html[lang="en"] .hero-identity h1 { white-space: normal; font-size: clamp(1.75rem, 5vw, 4.5rem); }
+html[lang="en"] .hero-identity h1 > span:last-child { white-space: nowrap; }
+html[lang="en"] .section-title,
+html[lang="en"] #books-title { font-size: clamp(1.875rem, 3.5vw, 3.25rem); }
+
 /* 页面与局部手写样式共用主题色，图片和品牌素材保持原色。 */
 :root {
   color-scheme: light;

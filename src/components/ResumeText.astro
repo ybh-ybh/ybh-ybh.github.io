@@ -1,0 +1,11 @@
+---
+interface Props {
+  text: string;
+}
+
+// 只识别附件使用的行内加粗，其余内容均由 Astro 按文本转义。
+const { text } = Astro.props;
+// 捕获组保留加粗片段的位置，不启用原始 HTML 或其他 Markdown 语法。
+const parts = text.split(/\*\*([^*]+)\*\*/g);
+---
+{parts.map((part, index) => index % 2 === 1 ? <strong>{part}</strong> : part)}
