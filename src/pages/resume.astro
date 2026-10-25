@@ -4,6 +4,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import ResumeText from "../components/ResumeText.astro";
 import ResumeProjects from "../components/ResumeProjects.astro";
 import ResumeHero from "../components/ResumeHero.astro";
+import ResumeWork from "../components/ResumeWork.astro";
 import profileImage from "../assets/profile.png";
 import { resumeData } from "../data/resume";
 import { siteConfig } from "../config";
@@ -48,6 +49,8 @@ const personSchema = {
         <div data-resume-retreat><ResumeHero /></div>
       </div>
       <div class="resume-overview">
+        <div data-overview-retreat>
+        <div class="resume-glow-surface">
         <section id="resume-profile" class="resume-profile resume-glass" aria-label="基本信息">
           <div class="resume-profile-content">
             <div class="resume-profile-heading">
@@ -73,7 +76,9 @@ const personSchema = {
           </div>
           <Image src={profileImage} alt={`${resumeData.profile.name}的头像`} width={160} height={160} format="webp" quality={86} loading="lazy" class="resume-portrait" />
         </section>
+        </div>
 
+        <div class="resume-glow-surface">
         <section id="resume-skills" class="resume-skills resume-glass" aria-labelledby="resume-skills-title">
           <h2 id="resume-skills-title" class="resume-section-title">专业技能</h2>
           <div class="resume-skill-groups">
@@ -87,32 +92,15 @@ const personSchema = {
             ))}
           </div>
         </section>
+        </div>
+        </div>
       </div>
 
-      <div class="resume-spread resume-experience">
-        <section id="resume-work" class="resume-column" aria-labelledby="resume-work-title">
-          <h2 id="resume-work-title" class="resume-section-title">工作经历</h2>
-          <div class="resume-entries">
-            {resumeData.workExperiences.map((work) => (
-              <div class="resume-entry">
-                <p class="resume-date">{work.date}</p>
-                <h3 class="resume-entry-title">{work.company}</h3>
-                <p class="resume-job-title">{work.jobTitle}</p>
-                {work.descriptions.length > 0 && (
-                  <ul class="resume-list resume-copy resume-entry-details">
-                    {work.descriptions.map((description) => <li><ResumeText text={description} /></li>)}
-                  </ul>
-                )}
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="resume-projects" class="resume-column resume-main-column" aria-labelledby="resume-projects-title">
-          <h2 id="resume-projects-title" class="resume-section-title">项目经历</h2>
-          <ResumeProjects />
-        </section>
-      </div>
+      <ResumeWork />
+      <section id="resume-projects" aria-labelledby="resume-projects-title">
+        <h2 id="resume-projects-title" class="resume-section-title">项目经历</h2>
+        <ResumeProjects />
+      </section>
     </article>
     <div class="resume-copy-toast" role="status" aria-live="polite" aria-atomic="true" data-copy-toast></div>
   </div>
@@ -120,8 +108,13 @@ const personSchema = {
 
 <script>
   import { initResumeTransition } from "../scripts/resumeTransition";
+  import { initResumeGlow } from "../scripts/resumeGlow";
 
-  // 滚动退场只作用于简历首屏，热更新时释放其固定层与动画。
+  // 两张信息卡片共享轻量追光逻辑，独立于首屏滚动动画。
+  const disposeResumeGlow = initResumeGlow();
+  if (import.meta.hot) import.meta.hot.dispose(disposeResumeGlow);
+
+  // 首屏和信息技能区依次退场，热更新时释放各自固定层与动画。
   const disposeResumeTransition = initResumeTransition();
   if (import.meta.hot) import.meta.hot.dispose(disposeResumeTransition);
 
@@ -212,17 +205,63 @@ const personSchema = {
   .resume-column { min-width: 0; }
 
   /* 上方横幅完整展开，下方技能内收并无缝相接，形成主子卡片。 */
-  .resume-overview { position: relative; z-index: 2; min-width: 0; }
+  /* 留白位于两张卡片外侧，并计入退场容器高度：先露出留白，再固定退场。 */
+  .resume-overview { position: relative; z-index: 2; min-width: 0; padding-bottom: clamp(80px, 12svh, 128px); }
   .resume-stage { position: relative; z-index: 0; min-width: 0; }
-  [data-resume-retreat] { transform-origin: 50% 45%; }
+  [data-resume-retreat], [data-overview-retreat] { transform-origin: 50% 45%; }
+  /* 工作经历从后退的卡片上方进入，不被透明卡片层遮挡。 */
+  :global(.resume-page > [data-resume-work]) { position: relative; z-index: 3; }
 
   .resume-glass {
+    position: relative;
+    isolation: isolate;
     border: 1px solid var(--border-color);
     /* 降低底色遮挡，并保留透过玻璃可辨认的模糊网格。 */
     background: rgba(255, 255, 255, 0.34);
     -webkit-backdrop-filter: blur(8px) saturate(135%);
     backdrop-filter: blur(8px) saturate(135%);
     box-shadow: 0 12px 40px -24px rgba(30, 55, 90, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  }
+
+  /* 装饰置于文字下方，仅裁切自身，不裁切正文及键盘焦点。 */
+  .resume-glow-surface { position: relative; min-width: 0; }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .resume-glass::before,
+    .resume-glass::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      border-radius: inherit;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 250ms ease-out;
+    }
+
+    .resume-glass::before {
+      inset: 0;
+      background: radial-gradient(circle 170px at var(--glow-x, 50%) var(--glow-y, 50%), rgba(147, 197, 253, 0.13) 0%, rgba(147, 197, 253, 0.045) 35%, rgba(147, 197, 253, 0.012) 65%, transparent 100%);
+    }
+
+    .resume-glass::after {
+      inset: -1px;
+      padding: 1px;
+      background: radial-gradient(circle 170px at var(--glow-x, 50%) var(--glow-y, 50%), rgba(147, 197, 253, 0.5), transparent 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask-composite: exclude;
+    }
+
+    /* 技能子卡片没有上边框，追光也不能画出连接缝。 */
+    .resume-skills::after { top: 0; padding-top: 0; }
+
+    .resume-glass[data-glow-active]::before,
+    .resume-glass[data-glow-active]::after { opacity: 1; transition-duration: 180ms; }
+
+    :global(html[data-theme="dark"]) .resume-glass::before {
+      background: radial-gradient(circle 170px at var(--glow-x, 50%) var(--glow-y, 50%), rgba(191, 219, 254, 0.10) 0%, rgba(191, 219, 254, 0.035) 35%, rgba(191, 219, 254, 0.01) 65%, transparent 100%);
+    }
   }
 
   :global(html[data-theme="dark"]) .resume-glass {

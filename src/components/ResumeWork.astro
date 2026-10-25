@@ -1,0 +1,144 @@
+---
+import ResumeText from "./ResumeText.astro";
+import { resumeData } from "../data/resume";
+
+// 按入职年月正序展示，导航与职责使用同一份排序结果，不修改原始数据。
+const experiences = [...resumeData.workExperiences].sort((previous, next) => previous.date.slice(0, 7).localeCompare(next.date.slice(0, 7)));
+---
+
+<section id="resume-work" class="work-section" aria-labelledby="resume-work-title" data-resume-work>
+  <div class="work-stage" data-work-stage>
+  <h2 id="resume-work-title" class="work-title">工作经历</h2>
+  <div class="work-layout">
+    <nav class="work-navigation" aria-label="工作经历时间线">
+      <ol class="work-timeline">
+        {experiences.map((work, index) => (
+          <li class="work-node">
+            {index === 0 && <span class="work-flow work-flow-desktop" aria-hidden="true"><span class="work-flow-fill"><span class="work-flow-sweep">
+              <svg class="work-flow-dot" viewBox="-8 -8 16 16" focusable="false"><circle r="8" fill="currentColor" opacity="0.12" /><circle r="3" fill="currentColor" /><circle r="1" fill="var(--resume-grid-base)" /></svg>
+            </span></span></span>}
+            <button type="button" class="work-circle" data-work-index={index} aria-label={`查看${work.company}的岗位职责`} aria-controls={`work-duties-${index}`} disabled>
+              <span class="work-number" aria-hidden="true">{index + 1}</span>
+            </button>
+            <div class="work-meta">
+              <h3 class="work-company" data-label={work.company}><span>{work.company}</span></h3>
+              <p class="work-role" data-tone={index === 0 ? "green" : "blue"}>{work.jobTitle}</p>
+              <p class="work-date">{work.date}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </nav>
+    <div class="work-panels">
+      {experiences.map((work, index) => (
+        <article class="work-panel" aria-label={`${work.company}岗位职责`}>
+          {index === 0 && <span class="work-flow work-flow-mobile" aria-hidden="true"><span class="work-flow-fill"><span class="work-flow-sweep">
+            <svg class="work-flow-dot" viewBox="-8 -8 16 16" focusable="false"><circle r="8" fill="currentColor" opacity="0.12" /><circle r="3" fill="currentColor" /><circle r="1" fill="var(--resume-grid-base)" /></svg>
+          </span></span></span>}
+          <div class="work-mobile-heading work-node">
+            <button type="button" class="work-circle" data-work-index={index} aria-label={`查看${work.company}的岗位职责`} aria-controls={`work-duties-${index}`} disabled>
+              <span class="work-number" aria-hidden="true">{index + 1}</span>
+            </button>
+            <div class="work-meta">
+              <h3 class="work-company" data-label={work.company}><span>{work.company}</span></h3>
+              <p class="work-role" data-tone={index === 0 ? "green" : "blue"}>{work.jobTitle}</p>
+              <p class="work-date">{work.date}</p>
+            </div>
+          </div>
+          <div id={`work-duties-${index}`} class="work-duties" data-work-duties>
+            <div data-work-reveal>
+              <h4 class="work-duties-title">岗位职责</h4>
+              <ul class="work-copy">
+                {work.descriptions.map((description) => <li><ResumeText text={description} /></li>)}
+              </ul>
+            </div>
+          </div>
+        </article>
+      ))}
+    </div>
+  </div>
+  </div>
+</section>
+
+<script>
+  import { initResumeWork } from "../scripts/resumeWork";
+  // 只清理本模块的动画与事件，保留页面其他交互。
+  const disposeResumeWork = initResumeWork();
+  if (import.meta.hot) import.meta.hot.dispose(disposeResumeWork);
+</script>
+
+<style>
+  /* 复用首屏天空蓝的线条与光点色调，仅保留单一蓝色。 */
+  .work-section { min-width: 0; --work-signal: #749ed0; --work-line: color-mix(in srgb, #749ed0 52%, var(--resume-grid-base)); }
+  :global(html[data-theme="dark"]) .work-section { --work-signal: color-mix(in srgb, #749ed0 76%, #fff); --work-line: color-mix(in srgb, #749ed0 48%, var(--resume-grid-base)); }
+  .work-stage { display: flow-root; min-width: 0; }
+  /* 同格占位保留较高职责的高度，隐藏面板不退出布局。 */
+  [data-work-pinned] .work-panels { display: grid; }
+  [data-work-pinned] .work-panel { grid-area: 1 / 1; }
+  [data-work-pinned] .work-panel[aria-hidden="true"] { visibility: hidden; pointer-events: none; }
+  .work-title { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; color: var(--page-ink); font-size: 1.45rem; font-weight: 700; line-height: 1.4; }
+  .work-title::before { content: ""; width: 3px; height: 1.1em; border-radius: 999px; background: var(--accent-ink); }
+  .work-title::after { content: ""; height: 1px; flex: 1; background: var(--border-color); }
+  .work-navigation { display: none; }
+  .work-node { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 1rem; align-items: start; }
+  .work-circle { position: relative; z-index: 1; display: grid; place-items: center; width: 44px; height: 44px; border: 2px solid var(--page-ink); border-radius: 50%; color: var(--page-ink); background: var(--resume-grid-base); font-size: 1rem; cursor: pointer; }
+  .work-circle:disabled { cursor: default; }
+  /* 流动区域随填充长度变化，短进度下也能完整循环，不再长时间空等。 */
+  .work-flow { position: absolute; top: 44px; bottom: 0; left: 14px; width: 16px; pointer-events: none; z-index: 1; }
+  .work-flow-fill { position: relative; display: block; width: 100%; height: calc(var(--work-progress, 0) * 100%); overflow: hidden; }
+  /* 光点沿细线匀速前行，圆点与轻薄外圈沿用首屏的三层结构。 */
+  .work-flow-sweep { position: absolute; inset: 0; animation: work-flow-forward 3.2s linear infinite; animation-play-state: paused; }
+  .work-flow-dot { position: absolute; top: 0; left: 0; width: 16px; height: 16px; color: var(--work-signal); transform: translateY(-50%); }
+  [data-work-running] .work-flow-sweep { animation-play-state: running; }
+  .work-flow-desktop { display: none; }
+  @keyframes work-flow-forward {
+    from { transform: translateY(0); opacity: 0; }
+    12.5%, 87.5% { opacity: 0.95; }
+    to { transform: translateY(100%); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .work-flow { display: none !important; } }
+  .work-circle[aria-current="step"] { color: var(--accent-ink); background: color-mix(in srgb, var(--accent-ink) 8%, var(--resume-grid-base)); border-color: var(--accent-ink); }
+  .work-circle:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 5px; }
+  .work-company { color: var(--page-ink); font-size: 1.05rem; font-weight: 400; line-height: 1.65; overflow-wrap: anywhere; }
+  /* 用不可见粗体占位，切换字重时公司名不会换行跳动。 */
+  .work-company { display: grid; }
+  .work-company span, .work-company::after { grid-area: 1 / 1; }
+  .work-company::after { content: attr(data-label); font-weight: 600; visibility: hidden; }
+  .work-circle[aria-current="step"] + .work-meta .work-company { font-weight: 600; }
+  /* 底线与进度线共用2px宽度和整数像素起点，避免细线边缘错位；反向滚动同步收回。 */
+  .work-panel:not(:last-child)::after { content: ""; position: absolute; top: 44px; bottom: 0; left: 21px; width: 2px; border-radius: 999px; background: var(--work-line); transform: scaleY(var(--work-progress, 0)); transform-origin: top; pointer-events: none; }
+  .work-role { display: inline-block; margin-top: 0.65rem; padding: 0.2rem 0.7rem; border-radius: 999px; background: #dcfce7; color: #166534; font-size: 0.85rem; line-height: 1.6; }
+  :global(html[data-theme="dark"]) .work-role { background: rgba(74, 222, 128, 0.12); color: #86efac; }
+  .work-role[data-tone="blue"] { background: #dbeafe; color: #1d4ed8; }
+  :global(html[data-theme="dark"]) .work-role[data-tone="blue"] { background: rgba(96, 165, 250, 0.15); color: #93c5fd; }
+  /* 时间与职位胶囊内的文字对齐，略增字号和行高以便阅读。 */
+  .work-date { margin-top: 0.5rem; padding-left: 0.7rem; color: var(--muted-ink); font-size: 0.9375rem; line-height: 1.6; font-variant-numeric: tabular-nums; }
+  .work-panel { position: relative; padding-bottom: 3rem; }
+  .work-panel:last-child { padding-bottom: 0; }
+  .work-panel:not(:last-child)::before { content: ""; position: absolute; top: 44px; bottom: 0; left: 21px; width: 2px; background: var(--border-color); }
+  .work-duties { margin-left: 60px; padding-top: 1.5rem; scroll-margin-top: 96px; }
+  .work-duties-title { color: var(--accent-ink); font-size: 0.85rem; font-weight: 600; margin-bottom: 1rem; }
+  .work-copy { list-style: disc; padding-left: 1rem; color: var(--body-copy); font-size: 0.9375rem; line-height: 1.95; overflow-wrap: anywhere; }
+  .work-copy li + li { margin-top: 1.25rem; }
+  .work-copy li::marker { color: var(--muted-ink); font-size: 0.7em; }
+  .work-copy :global(strong) { color: var(--page-ink); font-weight: 600; }
+  @media (min-width: 1024px) {
+    .work-layout { display: grid; grid-template-columns: minmax(0, 38fr) minmax(0, 62fr); gap: 0; align-items: start; }
+    .work-navigation { display: block; padding-right: 2.5rem; }
+    .work-timeline { list-style: none; padding: 0; margin: 0; }
+    .work-node { grid-template-columns: 50px minmax(0, 1fr); gap: 1.25rem; }
+    .work-circle { width: 50px; height: 50px; }
+    .work-flow-desktop { display: block; top: 50px; left: 17px; }
+    .work-flow-mobile { display: none; }
+    .work-timeline .work-node { padding-bottom: 2.5rem; }
+    .work-timeline .work-node:last-child { padding-bottom: 0; }
+    .work-timeline .work-node:not(:last-child)::before { content: ""; position: absolute; top: 50px; bottom: 0; left: 24px; width: 2px; background: var(--border-color); }
+    .work-timeline .work-node:not(:last-child)::after { content: ""; position: absolute; top: 50px; bottom: 0; left: 24px; width: 2px; border-radius: 999px; background: var(--work-line); transform: scaleY(var(--work-progress, 0)); transform-origin: top; pointer-events: none; }
+    .work-company { font-size: 1.15rem; }
+    .work-mobile-heading { display: none; }
+    .work-panel { padding-bottom: 0; }
+    .work-panel::before, .work-panel::after { display: none; }
+    .work-duties { margin-left: 0; padding: 0 0 3rem 2rem; }
+    .work-duties-title { margin-top: 0.25rem; }
+  }
+</style>
