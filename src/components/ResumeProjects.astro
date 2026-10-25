@@ -46,7 +46,9 @@ const projects = resumeData.projects;
 <script>
   import { initResumeProjects } from "../scripts/resumeProjects";
 
-  initResumeProjects();
+  // 热更新时清理方向变化与项目按钮监听。
+  const disposeResumeProjects = initResumeProjects();
+  if (import.meta.hot) import.meta.hot.dispose(disposeResumeProjects);
 </script>
 
 <style>
@@ -178,6 +180,13 @@ const projects = resumeData.projects;
 
   .resume-project-details > li + li { margin-top: 0.8rem; }
   .resume-project-details > li::marker { color: var(--muted-ink); font-size: 0.7em; }
+
+  /* 宽屏左侧选择项目、右侧阅读正文；无脚本时仍完整铺开所有项目。 */
+  @media (min-width: 768px) {
+    .resume-project-switcher[data-enhanced] { display: grid; grid-template-columns: minmax(8.4rem, 0.196fr) minmax(0, 0.804fr); gap: 2.5rem; align-items: start; }
+    .resume-project-tabs:not([hidden]) { grid-template-columns: minmax(0, 1fr); margin-bottom: 0; }
+    .resume-project-panels { min-width: 0; }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     .resume-project-tab { transition: none; }

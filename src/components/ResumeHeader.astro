@@ -4,18 +4,31 @@ import ThemeSwitch from "./ThemeSwitch.astro";
 
 <header class="resume-header" lang="zh-CN">
   <nav class="resume-controls" aria-label="简历页面操作">
-    <a class="resume-home" href="/">
+    <a class="resume-home" href="/" aria-label="返回首页">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="M19 12H5m7-7-7 7 7 7" />
       </svg>
       <span>返回首页</span>
     </a>
+    <div class="resume-section-nav" aria-label="简历章节" data-resume-nav>
+      <span class="resume-nav-indicator" aria-hidden="true"></span>
+      <a href="#resume-intro" aria-current="location"><span class="resume-nav-full">个人概览</span><span class="resume-nav-short">概览</span></a>
+      <a href="#resume-information"><span class="resume-nav-full">信息与技能</span><span class="resume-nav-short">技能</span></a>
+      <a href="#resume-experience"><span class="resume-nav-full">工作与项目</span><span class="resume-nav-short">经历</span></a>
+    </div>
     <div class="resume-theme"><ThemeSwitch /></div>
   </nav>
 </header>
 
+<script>
+  import { initResumeNavigation } from "../scripts/resumeNavigation";
+  // 导航只管理简历章节定位与高亮，热更新时回收监听。
+  const disposeResumeNavigation = initResumeNavigation();
+  if (import.meta.hot) import.meta.hot.dispose(disposeResumeNavigation);
+</script>
+
 <style>
-  /* 整个固定层保持透明并允许穿透，只有两端控件接收点击。 */
+  /* 固定层保持透明，只有左右控件和居中的胶囊导航接收点击。 */
   .resume-header {
     position: fixed;
     inset: 0 0 auto;
@@ -25,8 +38,9 @@ import ThemeSwitch from "./ThemeSwitch.astro";
   }
 
   .resume-controls {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 0.5rem;
     align-items: center;
     max-width: 77rem;
     margin-inline: auto;
@@ -34,6 +48,18 @@ import ThemeSwitch from "./ThemeSwitch.astro";
 
   .resume-home,
   .resume-theme { pointer-events: auto; }
+  .resume-home { justify-self: start; }
+  .resume-theme { justify-self: end; }
+  .resume-section-nav { position: relative; display: flex; align-items: center; padding: 4px; border: 1px solid var(--border-color); border-radius: 999px; background: var(--page-bg); pointer-events: auto; box-shadow: 0 2px 8px rgb(15 23 42 / 3%); }
+  .resume-section-nav a { position: relative; z-index: 1; display: grid; place-items: center; min-height: 36px; min-width: 44px; padding: 0.55rem 1rem; border-radius: 999px; color: var(--muted-ink); font-size: 0.8125rem; line-height: 1.5; white-space: nowrap; text-decoration: none; transition: color 180ms ease; }
+  .resume-section-nav a:hover { color: var(--page-ink); }
+  .resume-section-nav a[aria-current="location"] { color: var(--page-ink); background: color-mix(in srgb, var(--page-ink) 6%, var(--page-bg)); }
+  /* 一个共享底衬在按钮间滑动，文字和点击区域始终保持静止。 */
+  .resume-nav-indicator { display: none; position: absolute; top: 0; left: 0; width: var(--nav-width); height: var(--nav-height); transform: translate3d(var(--nav-x), var(--nav-y), 0); border-radius: 999px; background: color-mix(in srgb, var(--page-ink) 6%, var(--page-bg)); pointer-events: none; }
+  .resume-section-nav[data-indicator-ready] .resume-nav-indicator { display: block; transition: transform 320ms cubic-bezier(0.22, 1, 0.36, 1), width 320ms cubic-bezier(0.22, 1, 0.36, 1), height 180ms ease; }
+  .resume-section-nav[data-indicator-ready] a[aria-current="location"] { background: transparent; }
+  .resume-section-nav a:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; }
+  .resume-nav-short { display: none; }
 
   .resume-home {
     display: inline-flex;
@@ -81,6 +107,7 @@ import ThemeSwitch from "./ThemeSwitch.astro";
 
   @supports ((backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px))) {
     .resume-home,
+    .resume-section-nav,
     .resume-theme :global(.switch) {
       background: var(--header-glass);
       -webkit-backdrop-filter: blur(10px);
@@ -96,12 +123,17 @@ import ThemeSwitch from "./ThemeSwitch.astro";
     }
   }
 
-  @media (max-width: 359px) {
-    .resume-header { padding-inline: max(1.25rem, env(safe-area-inset-left)) max(1.25rem, env(safe-area-inset-right)); }
+  @media (max-width: 639px) {
+    .resume-header { padding-inline: max(0.75rem, env(safe-area-inset-left)) max(0.75rem, env(safe-area-inset-right)); }
+    .resume-home { width: 44px; padding: 0; }
+    .resume-home > span, .resume-nav-full { display: none; }
+    .resume-nav-short { display: inline; }
+    .resume-section-nav a { min-height: 44px; padding: 0.5rem; font-size: 0.75rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .resume-home { transition: none; }
+    .resume-home, .resume-section-nav a { transition: none; }
+    .resume-section-nav[data-indicator-ready] .resume-nav-indicator { transition: none; }
     .resume-home:hover { transform: none; }
   }
 

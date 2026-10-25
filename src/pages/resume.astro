@@ -45,10 +45,10 @@ const personSchema = {
   <div class="resume-shell grid-wrapper" lang="zh-CN">
     <div class="grid-background" aria-hidden="true"></div>
     <article lang="zh-CN" class="resume-page" aria-labelledby="resume-title">
-      <div class="resume-stage" data-resume-stage>
+      <div id="resume-intro" class="resume-stage" data-resume-stage>
         <div data-resume-retreat><ResumeHero /></div>
       </div>
-      <div class="resume-overview">
+      <div id="resume-information" class="resume-overview">
         <div data-overview-retreat>
         <div class="resume-glow-surface">
         <section id="resume-profile" class="resume-profile resume-glass" aria-label="基本信息">
@@ -96,11 +96,13 @@ const personSchema = {
         </div>
       </div>
 
+      <div id="resume-experience" class="resume-experience" data-resume-experience>
       <ResumeWork />
       <section id="resume-projects" aria-labelledby="resume-projects-title">
         <h2 id="resume-projects-title" class="resume-section-title">项目经历</h2>
         <ResumeProjects />
       </section>
+      </div>
     </article>
     <div class="resume-copy-toast" role="status" aria-live="polite" aria-atomic="true" data-copy-toast></div>
   </div>
@@ -210,7 +212,8 @@ const personSchema = {
   .resume-stage { position: relative; z-index: 0; min-width: 0; }
   [data-resume-retreat], [data-overview-retreat] { transform-origin: 50% 45%; }
   /* 工作经历从后退的卡片上方进入，不被透明卡片层遮挡。 */
-  :global(.resume-page > [data-resume-work]) { position: relative; z-index: 3; }
+  .resume-experience { position: relative; z-index: 3; min-width: 0; }
+  #resume-intro, #resume-information, #resume-experience { scroll-margin-top: 96px; }
 
   .resume-glass {
     position: relative;

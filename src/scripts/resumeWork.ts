@@ -8,6 +8,8 @@ export function initResumeWork(): () => void {
   // 标题、横线、时间线与职责共用同一个固定层。
   const stage = root?.querySelector<HTMLElement>("[data-work-stage]");
   if (!root || !stage) return () => {};
+  // 工作与项目共用固定容器，滚动占位留在整组之后，避免两节之间出现空洞。
+  const experience = root.closest<HTMLElement>("[data-resume-experience]") ?? stage;
   // 两家公司面板同格占位，避免切换高度跳动。
   const panels = Array.from(root.querySelectorAll<HTMLElement>(".work-panel"));
   // 降级模式下的自然滚动目标。
@@ -108,7 +110,7 @@ export function initResumeWork(): () => void {
       const timeline = gsap.timeline({
         scrollTrigger: {
           trigger: stage, start: "top 96px", end: () => `+=${innerHeight * 0.8}`,
-          pin: stage, pinSpacing: true, scrub: true, invalidateOnRefresh: true,
+          pin: experience, pinSpacing: true, scrub: true, invalidateOnRefresh: true,
           onUpdate: syncPinned,
           onRefresh: syncPinned,
         },
