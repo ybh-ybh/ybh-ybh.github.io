@@ -2,6 +2,7 @@
 import Header from "../components/Header.astro";
 import ResumeHeader from "../components/ResumeHeader.astro";
 import Footer from "../components/Footer.astro";
+import Liveling from "../components/Liveling.astro";
 import { siteConfig } from "../config";
 import { bilingual, copy, localizedAttrs } from "../i18n";
 import "../styles/global.css";
@@ -121,5 +122,6 @@ const englishPersonSchema = customPersonSchema ?? { ...defaultPersonSchema, name
       : <Header homePath={homePath} navLinks={navLinks} showLanguageSwitch={showLanguageSwitch} />}
     <main><slot /></main>
     <Footer />
+    <Liveling />
   </body>
 </html>

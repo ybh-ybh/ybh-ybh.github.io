@@ -1,0 +1,168 @@
+---
+import LocalizedText from "./LocalizedText.astro";
+import { bilingual } from "../i18n";
+---
+
+<aside class="site-mascot" data-site-mascot data-collapsed="false" hidden>
+  <div id="site-cloud-panel" class="mascot-panel" data-mascot-panel></div>
+  <button
+    class="mascot-toggle"
+    type="button"
+    data-mascot-toggle
+    aria-controls="site-cloud-panel"
+    aria-expanded="true"
+    aria-label="收起小云"
+    title="收起小云"
+  >
+    <svg class="mascot-collapse" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+      <path d="M6 12h12" stroke-linecap="round" />
+    </svg>
+    <span class="mascot-expand">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <path d="M6.5 18a4.5 4.5 0 0 1-.4-9 6 6 0 0 1 11.6 1.5A3.8 3.8 0 1 1 18 18Z" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+      <LocalizedText text={bilingual("小云", "Puff")} />
+    </span>
+  </button>
+  <template data-mascot-template>
+    <live-ling character="cloud" state="idle" sound="false" style="display:block;width:100%;height:100%"></live-ling>
+  </template>
+</aside>
+
+<script is:inline type="module" src="/vendor/livelings/livelings.js"></script>
+
+<script>
+  import { currentLocale } from "../scripts/language";
+
+  // 全站共用一个挂载点，收起后移除实例，让第三方引擎释放动画与事件。
+  const root = document.querySelector<HTMLElement>("[data-site-mascot]");
+  // 控制按钮始终保留在面板外，收起时也可以用键盘重新展开。
+  const toggle = root?.querySelector<HTMLButtonElement>("[data-mascot-toggle]");
+  // 面板只负责容纳角色，不替换控件或页脚节点。
+  const panel = root?.querySelector<HTMLElement>("[data-mascot-panel]");
+  // 模板中的角色在读取偏好后才接入页面，避免收起状态仍初始化动画。
+  const template = root?.querySelector<HTMLTemplateElement>("[data-mascot-template]");
+
+  if (root && toggle && panel && template) {
+    // 保存全站统一的展开偏好，首次访问默认展开。
+    const storageKey = "portfolio-cloud-collapsed";
+    // 事件控制器只清理小云自身的监听。
+    const events = new AbortController();
+    // 存储受限时保留本页选择，不影响按钮工作。
+    let collapsed = false;
+    // 写入失败后不再让历史恢复时的旧值覆盖当前选择。
+    let storageUnavailable = false;
+
+    // 页面加载与历史返回时恢复同一偏好，存储异常则沿用本页状态。
+    const restorePreference = () => {
+      if (storageUnavailable) return;
+      try { collapsed = localStorage.getItem(storageKey) === "true"; }
+      catch { storageUnavailable = true; }
+    };
+
+    // 提示描述下一次操作，与网站当前语言保持一致。
+    const updateLabel = () => {
+      // 当前语言由网站现有语言模块维护。
+      const english = currentLocale() === "en";
+      // 收起和展开复用同一原生按钮，保持键盘焦点。
+      const label = collapsed
+        ? english ? "Show Puff" : "展开小云"
+        : english ? "Hide Puff" : "收起小云";
+      toggle.setAttribute("aria-label", label);
+      toggle.title = label;
+    };
+
+    // 同步可见性与实例生命周期，不给角色启用声音。
+    const render = () => {
+      root.dataset.collapsed = String(collapsed);
+      panel.hidden = collapsed;
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      if (collapsed) panel.replaceChildren();
+      else if (!panel.firstElementChild) panel.append(template.content.cloneNode(true));
+      updateLabel();
+    };
+
+    // 原生 click 同时覆盖鼠标、触摸、Enter 和空格操作。
+    toggle.addEventListener("click", () => {
+      collapsed = !collapsed;
+      try { localStorage.setItem(storageKey, String(collapsed)); }
+      catch { storageUnavailable = true; }
+      render();
+    }, { signal: events.signal });
+
+    // 语言切换只改按钮提示，保留角色当前动作。
+    window.addEventListener("portfolio:languagechange", updateLabel, { signal: events.signal });
+    // 从浏览器历史缓存返回时，与其他页面保存的偏好同步。
+    window.addEventListener("pageshow", () => {
+      restorePreference();
+      render();
+    }, { signal: events.signal });
+
+    // 等本地组件注册后再显示入口，脚本未加载时不留下失效控件。
+    void customElements.whenDefined("live-ling").then(() => {
+      if (events.signal.aborted) return;
+      restorePreference();
+      render();
+      root.hidden = false;
+    });
+
+    // 开发热更新时释放角色和监听，避免重复初始化。
+    if (import.meta.hot) import.meta.hot.dispose(() => {
+      events.abort();
+      panel.replaceChildren();
+      root.hidden = true;
+    });
+  }
+</script>
+
+<style>
+  /* 只让角色和按钮接收点击，周围透明区域仍可操作正文。 */
+  .site-mascot {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 30;
+    pointer-events: none;
+  }
+
+  .mascot-panel { width: 144px; height: 144px; pointer-events: auto; }
+
+  .mascot-toggle {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    color: var(--muted-ink);
+    background: var(--rail-glass);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .mascot-toggle:hover { color: var(--accent-ink); border-color: currentColor; }
+  .mascot-toggle:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 4px; }
+  /* 展开时的收起按钮和减号缩小一半，保留收起后的展开入口尺寸。 */
+  .site-mascot[data-collapsed="false"] .mascot-toggle { min-width: 22px; min-height: 22px; }
+  .mascot-collapse { width: 8px; height: 8px; }
+  .mascot-expand { display: none; align-items: center; gap: 6px; font-size: 12px; line-height: 1; }
+  .site-mascot[data-collapsed="true"] .mascot-toggle { position: static; padding: 0 14px; }
+  .site-mascot[data-collapsed="true"] .mascot-collapse { display: none; }
+  .site-mascot[data-collapsed="true"] .mascot-expand { display: inline-flex; }
+
+  @media (max-width: 640px) {
+    .mascot-panel { width: 112px; height: 112px; }
+  }
+
+  /* 打印简历时不输出浮动角色与控件。 */
+  @media print {
+    .site-mascot { display: none; }
+  }
+</style>

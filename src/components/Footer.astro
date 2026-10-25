@@ -4,7 +4,11 @@ import { siteConfig } from "../config";
 ---
 
 <footer class="relative border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-950">
-  <div class="mx-auto max-w-7xl px-8 py-6 text-center lg:px-24">
+  <!-- 窄屏预留小云的位置，避免右下角角色遮挡版权与署名。 -->
+  <div class="mx-auto max-w-7xl px-8 py-6 pb-36 text-center sm:pb-6 lg:px-24">
     <p class="text-xs text-gray-500 dark:text-slate-400">© {new Date().getFullYear()} Built with Astro.</p>
+    <p class="mt-2 text-xs text-gray-500 dark:text-slate-400">
+      <a class="hover:underline focus-visible:underline" href="https://livelings.makerjackie.com" target="_blank" rel="noopener noreferrer">Livelings by MakerJackie</a>
+    </p>
   </div>
 </footer>
